@@ -1,0 +1,22 @@
+@font-face {
+  font-family: "Gilroy";
+  src: url("/fonts/Gilroy-Black.ttf") format("truetype"),
+    url("/fonts/Gilroy-BlackItalic.ttf") format("truetype"),
+    url("/fonts/Gilroy-Bold.ttf") format("truetype"),
+    url("/fonts/Gilroy-BoldItalic.ttf") format("truetype"),
+    url("/fonts/Gilroy-ExtraBold.ttf") format("truetype"),
+    url("/fonts/Gilroy-ExtraBoldItalic.ttf") format("truetype"),
+    url("/fonts/Gilroy-Heavy.ttf") format("truetype"),
+    url("/fonts/Gilroy-HeavyItalic.ttf") format("truetype"),
+    url("/fonts/Gilroy-Light.ttf") format("truetype"),
+    url("/fonts/Gilroy-LightItalic.ttf") format("truetype"),
+    url("/fonts/Gilroy-Medium.ttf") format("truetype"),
+    url("/fonts/Gilroy-Regular.ttf") format("truetype"),
+    url("/fonts/Gilroy-RegularItalic.ttf") format("truetype"),
+    url("/fonts/Gilroy-SemiBold.ttf") format("truetype"),
+    url("/fonts/Gilroy-SemiBoldItalic.ttf") format("truetype"),
+    url("/fonts/Gilroy-Thin.ttf") format("truetype"),
+    url("/fonts/Gilroy-UltraLightItalic.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
