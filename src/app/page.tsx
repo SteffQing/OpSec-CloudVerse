@@ -2,7 +2,7 @@
 
 import Icons from "@/assets/plan-selection_icons";
 import useMQ from "@/hooks/useMediaQuery";
-import Plan from "./components/Plan";
+import Plan from "../components/Plan";
 import { useState } from "react";
 
 let features = [
