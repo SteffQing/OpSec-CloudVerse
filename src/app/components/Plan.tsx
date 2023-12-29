@@ -16,8 +16,8 @@ export default function Plan({ price, size, features }: Props) {
   const [dropdown, setDropdown] = useState(false);
   const isMobile = useMQ("(max-width: 768px)");
   return (
-    <div className="flex flex-col plan-element">
-      <div className="flex bg-gradient-to-r from-color1 to-color2 gap-4 justify-center items-center w-full p-4 md:flex-col md:border md:border-[#1D202D] md:rounded-lg md:shadow-custom z-10">
+    <div className="flex flex-col max-w-[400px] md:max-w-full w-full m-auto">
+      <div className="flex bg-gradient-to-r from-color1 to-color2 gap-4 justify-center items-center w-full p-4 md:flex-col border border-[#1D202D] rounded-lg md:shadow-custom z-10">
         <Image
           src={ServerIcon}
           alt="Server Icon"
@@ -46,7 +46,7 @@ export default function Plan({ price, size, features }: Props) {
         )}
       </div>
       {!isMobile || dropdown ? (
-        <div className="bg-gradient-to-r from-color1 to-color2 m-auto md:w-[280px] md:pt-4 md:rounded-bl-2xl md:rounded-br-2xl md:overflow-hidden">
+        <div className="bg-gradient-to-r from-color1 to-color2 m-auto md:w-sibling_80 md:pt-4 md:rounded-bl-2xl md:rounded-br-2xl md:overflow-hidden border border-[#1D202D]">
           <aside className="p-4 flex flex-col gap-2 items-center">
             {features.map((feature, i) => (
               <span key={i}>{feature}</span>

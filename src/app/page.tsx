@@ -42,7 +42,7 @@ export default function Home() {
   return (
     <main className="px-4 md:px-6 pt-44 md:pt-24 bg-[#0A0B14]">
       <TopPage page={page} setPage={setPage} />
-      <section className="flex gap-3 flex-col md:flex-row flex-wrap justify-center items-center">
+      <section className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 ml-0 lg:ml-0.5 my-6">
         {dummydata.map((plan, index) => (
           <Plan
             price={plan.price}
@@ -55,7 +55,7 @@ export default function Home() {
     </main>
   );
 }
-
+// grid gap-2 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 ml-0 lg:ml-0.5
 function TopPage({ page, setPage }: { page: number; setPage: any }) {
   const isTablet = useMQ("(max-width: 768px)");
   const controls = [

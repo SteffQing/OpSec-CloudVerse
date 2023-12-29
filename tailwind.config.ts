@@ -21,6 +21,9 @@ const config: Config = {
       boxShadow: {
         custom: "-7px 42px 57.7px 0px rgba(0, 0, 0, 0.6)",
       },
+      width: {
+        sibling_80: "calc(100% - 2rem)",
+      },
     },
   },
   plugins: [],
