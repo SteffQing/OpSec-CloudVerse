@@ -1,7 +1,7 @@
 import * as React from "react";
 
 interface Props {
-  highlight?: boolean;
+  highlight: boolean;
 }
 
 const Budget_Residential = ({ highlight }: Props) => (
@@ -99,3 +99,12 @@ const Premium_Residential = ({ highlight }: Props) => (
     />
   </svg>
 );
+
+const icons = [
+  Budget_Residential,
+  Premium_Residential,
+  Premium_LTE,
+  Mobile_LTE,
+];
+
+export default icons;
