@@ -22,7 +22,7 @@ export default function Navbar() {
     "py-2 px-10 whitespace-nowrap text-[#52525B] transition-all";
   let navList_styleActive = " !text-white bg-[#F44336] rounded-[50px]";
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-black">
       <div className="flex flex-col items-center justify-between p-4 md:flex-row md:justify-evenly lg:justify-center">
         <a href="/" className="flex items-center gap-2 lg:absolute left-6">
           <Image
