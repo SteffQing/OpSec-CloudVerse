@@ -4,6 +4,7 @@ import Icons from "@/assets/plan-selection_icons";
 import useMQ from "@/hooks/useMediaQuery";
 import Plan from "../components/Plan";
 import { useState } from "react";
+import { Plans } from "@/lib/data";
 
 let features = [
   "7.000.000+ IP Pool",
@@ -58,12 +59,7 @@ export default function Home() {
 // grid gap-2 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 ml-0 lg:ml-0.5
 function TopPage({ page, setPage }: { page: number; setPage: any }) {
   const isTablet = useMQ("(max-width: 768px)");
-  const controls = [
-    "Budget Residential",
-    "Premium Residential",
-    "Premium LTE",
-    "Mobile LTE",
-  ];
+
   return (
     <div className="top-page">
       <div className="pt-24 text-center">
@@ -79,7 +75,7 @@ function TopPage({ page, setPage }: { page: number; setPage: any }) {
         </p>
       </div>
       <div className="flex gap-8 px-4 border-2 bg-[#0A0B14] shadow-[box-shadow: -32px 23px 30.799999237060547px 0px #18181866] border-[#1D202D] rounded-xl overflow-x-auto controls min-[500px]:justify-center absolute bottom-3 left-2 right-2">
-        {controls.map((control, i) => {
+        {Plans.map((plan, i) => {
           let Icon = Icons[i];
           return (
             <div
@@ -89,12 +85,12 @@ function TopPage({ page, setPage }: { page: number; setPage: any }) {
                   ? { borderBottom: "1px solid #F44336", color: "#F44336" }
                   : {}
               }
-              key={control}
+              key={plan}
               onClick={() => setPage(i)}
             >
               {!isTablet && <Icon highlight={page === i} />}
               <span className="font-light text-sm whitespace-nowrap">
-                {control}
+                {plan}
               </span>
             </div>
           );

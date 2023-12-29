@@ -95,3 +95,13 @@ body {
   top: 50%;
   transform: translateY(-50%);
 }
+.amount-input_span1,
+.amount-input_span2 {
+  position: absolute;
+  z-index: 2;
+  color: #fff;
+  font-size: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 20px;
+}

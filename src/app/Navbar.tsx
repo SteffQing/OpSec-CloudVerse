@@ -1,5 +1,6 @@
 "use client";
 
+import { navList } from "@/lib/data";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 
@@ -7,17 +8,6 @@ export default function Navbar() {
   let pathname = usePathname();
   let index = pathname.indexOf("/", 1);
   pathname = pathname.slice(0, index !== -1 ? index : undefined);
-
-  let navList = [
-    {
-      name: "Pricing",
-      href: "/",
-    },
-    {
-      name: "Client Area",
-      href: "/client",
-    },
-  ];
 
   let navList_styleNormal =
     "py-2 px-10 whitespace-nowrap text-[#54597C] transition-all";
