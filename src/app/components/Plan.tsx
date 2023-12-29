@@ -48,8 +48,8 @@ export default function Plan({ price, size, features }: Props) {
       {!isMobile || dropdown ? (
         <div className="">
           <aside className="p-4 flex flex-col gap-2 items-center">
-            {features.map((feature) => (
-              <span>{feature}</span>
+            {features.map((feature, i) => (
+              <span key={i}>{feature}</span>
             ))}
           </aside>
           <button className="bg-[#f44336] w-full p-4">BUY NOW</button>

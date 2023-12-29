@@ -77,3 +77,29 @@ body {
   border: 1px solid transparent;
   background-repeat: repeat-x;
 }
+
+.login-input {
+  position: relative;
+  background-color: #1d202d;
+  border: 1px solid #54597c;
+  width: 100%;
+}
+.login-input::placeholder {
+  color: #54597c;
+  font-size: 16px;
+}
+.login-input:focus {
+  outline: none;
+}
+.login-input_span::before {
+  position: absolute;
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background-color: red;
+  left: 10px;
+  z-index: 5;
+  top: 50%;
+  transform: translateY(-50%);
+}

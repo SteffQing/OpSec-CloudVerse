@@ -1,11 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 export default function Navbar() {
-  const route = useRouter();
-  const pathname = usePathname();
+  let pathname = usePathname();
+  let index = pathname.indexOf("/", 1);
+  pathname = pathname.slice(0, index !== -1 ? index : undefined);
 
   let navList = [
     {
@@ -22,7 +23,7 @@ export default function Navbar() {
     "py-2 px-10 whitespace-nowrap text-[#52525B] transition-all";
   let navList_styleActive = " !text-white bg-[#F44336] rounded-[50px]";
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-black">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-black md:border-b md:border-[#1D202D]">
       <div className="flex flex-col items-center justify-between p-4 md:flex-row md:justify-evenly lg:justify-center">
         <a href="/" className="flex items-center gap-2 lg:absolute left-6">
           <Image
