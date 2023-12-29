@@ -40,7 +40,7 @@ const dummydata = [
 export default function Home() {
   const [page, setPage] = useState(0);
   return (
-    <main className="px-4 md:px-6 pt-44 md:pt-24">
+    <main className="px-4 md:px-6 pt-44 md:pt-24 bg-[#0A0B14]">
       <TopPage page={page} setPage={setPage} />
       <section className="flex gap-3 flex-col md:flex-row flex-wrap justify-center items-center">
         {dummydata.map((plan, index) => (

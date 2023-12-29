@@ -20,10 +20,10 @@ export default function Navbar() {
   ];
 
   let navList_styleNormal =
-    "py-2 px-10 whitespace-nowrap text-[#52525B] transition-all";
+    "py-2 px-10 whitespace-nowrap text-[#54597C] transition-all";
   let navList_styleActive = " !text-white bg-[#F44336] rounded-[50px]";
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-black md:border-b md:border-[#1D202D]">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0A0B14] md:border-b md:border-[#1D202D]">
       <div className="flex flex-col items-center justify-between p-4 md:flex-row md:justify-evenly lg:justify-center">
         <a href="/" className="flex items-center gap-2 lg:absolute left-6">
           <Image
