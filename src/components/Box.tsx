@@ -9,6 +9,7 @@ interface BoxWrapperProps {
 
 export default function BoxWrapper(props: BoxWrapperProps) {
   const { children, title, width, textAlign } = props;
+
   return (
     <div
       className={cn(

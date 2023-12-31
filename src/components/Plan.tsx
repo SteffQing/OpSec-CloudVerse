@@ -5,16 +5,30 @@ import ServerIcon from "@/assets/server-icon.png";
 import ArrowIcon from "@/assets/arrow-down.png";
 import Image from "next/image";
 import { useState } from "react";
+import { ModalProps } from "./Modal";
 
 interface Props {
   price: number;
   size: number;
   features: string[];
+  setModal: (modal: ModalProps | null) => void;
 }
 
-export default function Plan({ price, size, features }: Props) {
+export default function Plan(props: Props) {
   const [dropdown, setDropdown] = useState(false);
   const isMobile = useMQ("(max-width: 768px)");
+
+  const { price, size, features, setModal } = props;
+
+  let modalData: ModalProps = {
+    title: "Enter email address",
+    subtitle: "Enter your email address",
+    id: price,
+    buttonText: "Continue",
+    setModal: setModal,
+    placeholder: "Example@example.com",
+  };
+
   return (
     <div className="flex flex-col max-w-[400px] md:max-w-full w-full m-auto">
       <div className="flex bg-gradient-to-r from-color1 to-color2 gap-4 justify-center items-center w-full p-4 md:flex-col border border-[#1D202D] rounded-lg md:shadow-custom z-10">
@@ -52,7 +66,12 @@ export default function Plan({ price, size, features }: Props) {
               <span key={i}>{feature}</span>
             ))}
           </aside>
-          <button className="bg-[#f44336] w-full p-4">BUY NOW</button>
+          <button
+            className="bg-[#f44336] w-full p-4"
+            onClick={() => setModal(modalData)}
+          >
+            BUY NOW
+          </button>
         </div>
       ) : null}
     </div>

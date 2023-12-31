@@ -28,6 +28,17 @@ body {
     rgb(var(--background-start-rgb));
 }
 
+/* Hide the up and down arrows for input type number */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
 .top-page {
   position: relative;
   height: 300px;
@@ -104,4 +115,24 @@ body {
   top: 50%;
   transform: translateY(-50%);
   right: 20px;
+}
+
+.proxy_aside button {
+  background-color: #1d202d;
+  border: 1px solid #54597c;
+  height: inherit;
+}
+
+.proxy_aside button:nth-child(1) {
+  width: calc(160 / 300 * 100%);
+}
+.proxy_aside section:nth-child(2) button:nth-child(1) {
+  width: calc(120 / 300 * 100%);
+}
+.proxy_aside button:nth-child(2) {
+  width: calc(180 / 300 * 100%);
+}
+
+.proxy_aside div {
+  width: calc(140 / 300 * 100%);
 }

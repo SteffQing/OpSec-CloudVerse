@@ -68,3 +68,35 @@ export let countries = [
   "East Timor",
   "Ecuador",
 ];
+
+let features = [
+  "7.000.000+ IP Pool",
+  "Unlimited Threads",
+  "Premium Support",
+  "Only user:pass auth",
+  "Country-Targetting available on request",
+  "Rotating/Sticky Sessions",
+];
+
+export const dummydata = [
+  {
+    price: 100,
+    size: 16,
+    features,
+  },
+  {
+    price: 200,
+    size: 32,
+    features,
+  },
+  {
+    price: 300,
+    size: 64,
+    features,
+  },
+  {
+    price: 400,
+    size: 128,
+    features,
+  },
+];

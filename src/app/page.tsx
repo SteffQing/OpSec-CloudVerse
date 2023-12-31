@@ -4,59 +4,37 @@ import Icons from "@/assets/plan-selection_icons";
 import useMQ from "@/hooks/useMediaQuery";
 import Plan from "../components/Plan";
 import { useState } from "react";
-import { Plans } from "@/lib/data";
-
-let features = [
-  "7.000.000+ IP Pool",
-  "Unlimited Threads",
-  "Premium Support",
-  "Only user:pass auth",
-  "Country-Targetting available on request",
-  "Rotating/Sticky Sessions",
-];
-
-const dummydata = [
-  {
-    price: 100,
-    size: 16,
-    features,
-  },
-  {
-    price: 200,
-    size: 32,
-    features,
-  },
-  {
-    price: 300,
-    size: 64,
-    features,
-  },
-  {
-    price: 400,
-    size: 128,
-    features,
-  },
-];
+import { Plans, dummydata } from "@/lib/data";
+import Modal, { ModalProps } from "@/components/Modal";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 export default function Home() {
   const [page, setPage] = useState(0);
+  const [modal, setModal] = useState<ModalProps | null>(null);
+
+  const client = new QueryClient();
+
   return (
-    <main className="px-4 md:px-6 pt-44 md:pt-24 bg-[#0A0B14]">
-      <TopPage page={page} setPage={setPage} />
-      <section className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 ml-0 lg:ml-0.5 my-6">
-        {dummydata.map((plan, index) => (
-          <Plan
-            price={plan.price}
-            size={plan.size}
-            features={plan.features}
-            key={index}
-          />
-        ))}
-      </section>
-    </main>
+    <QueryClientProvider client={client}>
+      <main className="px-4 md:px-6 pt-44 md:pt-24 bg-[#0A0B14] relative">
+        {modal && <Modal {...modal} />}
+        <TopPage page={page} setPage={setPage} />
+        <section className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 ml-0 lg:ml-0.5 my-6">
+          {dummydata.map((plan, index) => (
+            <Plan
+              price={plan.price}
+              size={plan.size}
+              features={plan.features}
+              key={index}
+              setModal={setModal}
+            />
+          ))}
+        </section>
+      </main>
+    </QueryClientProvider>
   );
 }
-// grid gap-2 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 ml-0 lg:ml-0.5
+
 function TopPage({ page, setPage }: { page: number; setPage: any }) {
   const isTablet = useMQ("(max-width: 768px)");
 
