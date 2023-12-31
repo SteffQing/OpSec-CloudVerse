@@ -6,4 +6,5 @@ export const {
   EmailJS_Mobile_Template,
   EmailJS_ServiceID,
   NOW_PAYMENTS_ENDPOINT,
+  REDIS_KEY,
 } = process.env;

@@ -1,7 +1,7 @@
 "use client";
 
 import useMQ from "@/hooks/useMediaQuery";
-import ServerIcon from "@/assets/server-icon.png";
+import ServerIcon from "@/assets/server_icon.png";
 import ArrowIcon from "@/assets/arrow-down.png";
 import Image from "next/image";
 import { useState } from "react";
