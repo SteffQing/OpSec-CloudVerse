@@ -5,6 +5,9 @@ import { useQuery } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { fetchInvoice, fetchReceiptStatus } from "@/lib/now_payments";
 import Loader from "@/assets/loader";
+import { dispatchProxy } from "@/lib/proxies";
+import { redisClient, validateEmail } from "@/lib/utils";
+// import { redisClient } from "@/lib/redis";
 
 export interface ModalProps {
   title: string;
@@ -24,13 +27,39 @@ export default function Modal(props: ModalProps) {
     props;
   useClickOutside(ref, () => setModal(null));
 
-  const { isLoading, isError, data, refetch } = useQuery({
+  const {
+    isLoading,
+    isError,
+    data: status,
+    refetch,
+  } = useQuery({
     queryKey: ["receipt_status"],
     queryFn: () => fetchReceiptStatus(receipt as number),
     enabled: false,
   });
 
-  function refer_to_pay() {
+  async function refer_to_pay() {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const isValidEmail = emailRegex.test(recipient);
+
+    if (!isValidEmail) {
+      alert("Please enter a valid email address");
+      return;
+    }
+    setLoading(true);
+    let validateMailAddress = await validateEmail(recipient);
+    const { autocorrect, deliverability } = validateMailAddress;
+    setLoading(false);
+    if (autocorrect) {
+      setRecipient(autocorrect);
+    }
+    if (deliverability === "UNDELIVERABLE") {
+      alert("Please enter a valid email address");
+      return;
+    }
+    let pending_payment = await redisClient("get", recipient, "");
+    setReceipt(pending_payment);
+
     let modal = {
       ...props,
       pay_now: true,
@@ -50,6 +79,15 @@ export default function Modal(props: ModalProps) {
       setReceipt(data.id);
       setLoading(false);
       window.open(data.invoice_url, "_blank");
+
+      let modal = {
+        ...props,
+        title: "Processing Payment",
+        buttonText: "Confirm Payment",
+        subtitle: "Click button below after payment to continue",
+      };
+      setModal(modal);
+      await redisClient("set", recipient, data.id);
     } catch (error) {
       let modal = {
         ...props,
@@ -58,6 +96,22 @@ export default function Modal(props: ModalProps) {
         subtitle: "There was an error in creating an invoice",
       };
       setModal(modal);
+      console.log(error);
+    }
+  }
+  async function process_proxy() {
+    try {
+      setLoading(true);
+      let response = await dispatchProxy(
+        receipt as number,
+        recipient,
+        "residential"
+      );
+      setLoading(false);
+      console.log(response);
+      let _receipt = receipt as number;
+      await redisClient("rem", recipient, _receipt.toString());
+    } catch (error) {
       console.log(error);
     }
   }
@@ -99,11 +153,7 @@ export default function Modal(props: ModalProps) {
               <button
                 className="bg-[#F44336] w-full rounded-md my-6 p-2 text-center"
                 onClick={
-                  pay_now
-                    ? process_pay
-                    : isError
-                    ? () => refetch()
-                    : refer_to_pay
+                  receipt ? process_proxy : pay_now ? process_pay : refer_to_pay
                 }
               >
                 {loading ? <Loader /> : buttonText}
