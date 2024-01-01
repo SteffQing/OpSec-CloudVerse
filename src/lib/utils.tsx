@@ -26,10 +26,20 @@ export async function redisClient(
   order_id: string
 ) {
   return axios
-    .get(
-      `${API_URL}/redis?action=${action}&email=${email}&order_id=${order_id}`
-    )
+    .get(`${API_URL}redis?action=${action}&email=${email}&order_id=${order_id}`)
     .then((response) => response.data)
+    .catch((error) => {
+      console.log(error);
+    });
+}
+
+export async function getIP() {
+  return axios
+    .get("https://api.ipify.org/")
+    .then((response) => {
+      console.log(response.data);
+      return response.data;
+    })
     .catch((error) => {
       console.log(error);
     });

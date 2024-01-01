@@ -1,5 +1,6 @@
-import * as React from "react";
-const Line = (props: React.SVGProps<SVGSVGElement>) => (
+import { SVGProps } from "react";
+
+export const Line_Tablet = (props: SVGProps<SVGSVGElement>) => (
   <svg
     width={1}
     height={241}
@@ -18,4 +19,16 @@ const Line = (props: React.SVGProps<SVGSVGElement>) => (
     />
   </svg>
 );
-export default Line;
+
+export const Line_Mobile = (props: SVGProps<SVGSVGElement>) => (
+  <svg
+    width={343}
+    height={1}
+    viewBox="0 0 343 1"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    {...props}
+  >
+    <line y1={0.5} x2={343} y2={0.5} stroke="#54597C" strokeDasharray="8 8" />
+  </svg>
+);

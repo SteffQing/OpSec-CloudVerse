@@ -1,3 +1,4 @@
+import { ParamsProps } from "@/components/Modal";
 import {
   EmailJS_Mobile_Template,
   EmailJS_Residential_Template,
@@ -6,13 +7,12 @@ import {
 import { fetchReceiptStatus } from "./now_payments";
 import emailjs from "@emailjs/browser";
 
-type ProxyType = "residential" | "mobile";
-
 export async function dispatchProxy(
   paymentID: number,
   recipient: string,
-  type: ProxyType
+  data: ParamsProps
 ) {
+  const { size, price, type } = data;
   let receipt = await fetchReceiptStatus(paymentID);
   console.log(receipt);
   if (receipt.status === false) {

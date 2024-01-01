@@ -6,7 +6,7 @@ let EmailJS_Residential_Template = "template_88phu08";
 let EmailJS_Mobile_Template = "template_44v88ps";
 let EmailJS_ServiceID = "service_iiplwio";
 let AbstractAPI_KEY = "3385af73f07f4f758a38a373f3e3aa22";
-let API_URL = "localhost:3000/";
+let API_URL = "http://localhost:3000/";
 
 export {
   REDIS_KEY,

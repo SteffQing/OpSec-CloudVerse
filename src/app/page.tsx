@@ -2,7 +2,7 @@
 
 import Icons from "@/assets/plan-selection_icons";
 import useMQ from "@/hooks/useMediaQuery";
-import Plan from "../components/Plan";
+import Plan, { PlanType } from "../components/Plan";
 import { useState } from "react";
 import { Plans, Mobile_LTE_Data, Residential_Data } from "@/lib/data";
 import Modal, { ModalProps } from "@/components/Modal";
@@ -12,6 +12,7 @@ export default function Home() {
   const [page, setPage] = useState(0);
   const [modal, setModal] = useState<ModalProps | null>(null);
   const data = page === 0 ? Residential_Data : Mobile_LTE_Data;
+  const planType: PlanType = page === 0 ? "residential" : "mobile";
 
   const client = new QueryClient();
 
@@ -21,14 +22,16 @@ export default function Home() {
         {modal && <Modal {...modal} />}
         <TopPage page={page} setPage={setPage} />
         {page === 0 || page === 3 ? (
-          <section className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 ml-0 lg:ml-0.5 my-6">
+          <section className="grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 ml-0 lg:ml-0.5 my-6">
             {data.map((plan, index) => (
               <Plan
                 price={plan.price}
                 size={plan.size}
                 features={plan.features}
+                subtext={plan.note}
                 key={index}
                 setModal={setModal}
+                type={planType}
               />
             ))}
           </section>

@@ -7,12 +7,18 @@ import { fetchInvoice, fetchReceiptStatus } from "@/lib/now_payments";
 import Loader from "@/assets/loader";
 import { dispatchProxy } from "@/lib/proxies";
 import { redisClient, validateEmail } from "@/lib/utils";
-// import { redisClient } from "@/lib/redis";
+import { PlanType } from "./Plan";
+import { useToast } from "./ui/use-toast";
 
+export interface ParamsProps {
+  size: number;
+  price: number;
+  type: PlanType;
+}
 export interface ModalProps {
   title: string;
   subtitle: string;
-  id: number;
+  data: ParamsProps;
   buttonText: string;
   setModal: (modal: null | ModalProps) => void;
   placeholder: string;
@@ -23,42 +29,43 @@ export default function Modal(props: ModalProps) {
   const [recipient, setRecipient] = useState("");
   const [loading, setLoading] = useState<boolean>(false);
   const [receipt, setReceipt] = useState<number | null>(null);
-  const { title, subtitle, id, buttonText, setModal, pay_now, placeholder } =
+  const { title, subtitle, data, buttonText, setModal, pay_now, placeholder } =
     props;
   useClickOutside(ref, () => setModal(null));
-
-  const {
-    isLoading,
-    isError,
-    data: status,
-    refetch,
-  } = useQuery({
-    queryKey: ["receipt_status"],
-    queryFn: () => fetchReceiptStatus(receipt as number),
-    enabled: false,
-  });
+  const { toast } = useToast();
 
   async function refer_to_pay() {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     const isValidEmail = emailRegex.test(recipient);
 
     if (!isValidEmail) {
-      alert("Please enter a valid email address");
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address",
+      });
       return;
     }
     setLoading(true);
     let validateMailAddress = await validateEmail(recipient);
     const { autocorrect, deliverability } = validateMailAddress;
-    setLoading(false);
     if (autocorrect) {
       setRecipient(autocorrect);
     }
     if (deliverability === "UNDELIVERABLE") {
-      alert("Please enter a valid email address");
+      toast({
+        title: "Invalid Email",
+        description: "Email provided is not deliverable. Try again",
+      });
       return;
     }
-    let pending_payment = await redisClient("get", recipient, "");
-    setReceipt(pending_payment);
+    let _receipt = await redisClient("get", recipient, "");
+    if (_receipt) {
+      let receiptStatus = await fetchReceiptStatus(_receipt);
+      console.log(_receipt, " AND ", receiptStatus);
+    }
+
+    setLoading(false);
+    // setReceipt(_receipt);
 
     let modal = {
       ...props,
@@ -67,18 +74,18 @@ export default function Modal(props: ModalProps) {
       buttonText: "Pay",
       subtitle: "PayNow method selected",
     };
-    setTimeout(() => {}, 1500);
+    // setTimeout(() => {}, 1500);
     setModal(modal);
   }
   async function process_pay() {
     try {
       setLoading(true);
-      let data = await fetchInvoice(id);
-      console.log(data);
+      let _data = await fetchInvoice(data);
+      console.log(_data);
 
-      setReceipt(data.id);
+      setReceipt(_data.id);
       setLoading(false);
-      window.open(data.invoice_url, "_blank");
+      window.open(_data.invoice_url, "_blank");
 
       let modal = {
         ...props,
@@ -87,7 +94,7 @@ export default function Modal(props: ModalProps) {
         subtitle: "Click button below after payment to continue",
       };
       setModal(modal);
-      await redisClient("set", recipient, data.id);
+      await redisClient("set", recipient, _data.id);
     } catch (error) {
       let modal = {
         ...props,
@@ -102,11 +109,7 @@ export default function Modal(props: ModalProps) {
   async function process_proxy() {
     try {
       setLoading(true);
-      let response = await dispatchProxy(
-        receipt as number,
-        recipient,
-        "residential"
-      );
+      let response = await dispatchProxy(receipt as number, recipient, data);
       setLoading(false);
       console.log(response);
       let _receipt = receipt as number;
@@ -114,15 +117,6 @@ export default function Modal(props: ModalProps) {
     } catch (error) {
       console.log(error);
     }
-  }
-  if (isError) {
-    let modal = {
-      ...props,
-      title: "Error",
-      buttonText: "Retry",
-      subtitle: "There was an error in fetching the invoice",
-    };
-    setModal(modal);
   }
   return (
     <main className="bg-transparent z-50 fixed w-full h-full">
