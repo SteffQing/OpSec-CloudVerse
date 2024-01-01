@@ -69,34 +69,61 @@ export let countries = [
   "Ecuador",
 ];
 
-let features = [
-  "7.000.000+ IP Pool",
+let Mobile_LTE_Features = [
+  "ATT ISP",
+  "Unlimited Threads",
+  "Rotation once per 30 minutes",
+  "Only IP Auth",
+  "USA IPs",
+  "One port, which rotates ip every 30 minutes",
+];
+export const Mobile_LTE_Data = [
+  {
+    price: 6,
+    size: 1,
+    note: "Per 1 Day of access",
+    features: Mobile_LTE_Features,
+  },
+  {
+    price: 35,
+    size: 7,
+    note: "Per 1 Week of access",
+    features: Mobile_LTE_Features,
+  },
+];
+
+let Residential_Features = [
+  "20.000.000+ IP Pool",
   "Unlimited Threads",
   "Premium Support",
   "Only user:pass auth",
-  "Country-Targetting available on request",
+  "Country/State/City Targetting Available",
   "Rotating/Sticky Sessions",
 ];
 
-export const dummydata = [
+export const Residential_Data = [
   {
-    price: 100,
-    size: 16,
-    features,
+    price: 5,
+    size: 1,
+    note: "Per 1 GB of data",
+    features: Residential_Features,
   },
   {
-    price: 200,
-    size: 32,
-    features,
+    price: 10,
+    size: 2,
+    note: "Per 2 GB of data",
+    features: Residential_Features,
   },
   {
-    price: 300,
-    size: 64,
-    features,
+    price: 24,
+    size: 5,
+    note: "Per 5 GB of data",
+    features: Residential_Features,
   },
   {
-    price: 400,
-    size: 128,
-    features,
+    price: 110,
+    size: 25,
+    note: "Per 25 GB of data",
+    features: Residential_Features,
   },
 ];

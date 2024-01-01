@@ -1,5 +1,6 @@
-import * as React from "react";
-const Import = (props: any) => (
+import { SVGProps } from "react";
+
+const Import = (props: SVGProps<SVGSVGElement>) => (
   <svg
     width={18}
     height={18}
@@ -19,7 +20,7 @@ const Import = (props: any) => (
   </svg>
 );
 
-const Doc_Copy = (props: any) => (
+const Doc_Copy = (props: SVGProps<SVGSVGElement>) => (
   <svg
     width={18}
     height={18}

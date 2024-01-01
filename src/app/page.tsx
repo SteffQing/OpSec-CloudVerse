@@ -4,13 +4,14 @@ import Icons from "@/assets/plan-selection_icons";
 import useMQ from "@/hooks/useMediaQuery";
 import Plan from "../components/Plan";
 import { useState } from "react";
-import { Plans, dummydata } from "@/lib/data";
+import { Plans, Mobile_LTE_Data, Residential_Data } from "@/lib/data";
 import Modal, { ModalProps } from "@/components/Modal";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 export default function Home() {
   const [page, setPage] = useState(0);
   const [modal, setModal] = useState<ModalProps | null>(null);
+  const data = page === 0 ? Residential_Data : Mobile_LTE_Data;
 
   const client = new QueryClient();
 
@@ -19,17 +20,21 @@ export default function Home() {
       <main className="px-4 md:px-6 pt-44 md:pt-24 bg-[#0A0B14] relative">
         {modal && <Modal {...modal} />}
         <TopPage page={page} setPage={setPage} />
-        <section className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 ml-0 lg:ml-0.5 my-6">
-          {dummydata.map((plan, index) => (
-            <Plan
-              price={plan.price}
-              size={plan.size}
-              features={plan.features}
-              key={index}
-              setModal={setModal}
-            />
-          ))}
-        </section>
+        {page === 0 || page === 3 ? (
+          <section className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 ml-0 lg:ml-0.5 my-6">
+            {data.map((plan, index) => (
+              <Plan
+                price={plan.price}
+                size={plan.size}
+                features={plan.features}
+                key={index}
+                setModal={setModal}
+              />
+            ))}
+          </section>
+        ) : (
+          <div>Coming Soon</div>
+        )}
       </main>
     </QueryClientProvider>
   );

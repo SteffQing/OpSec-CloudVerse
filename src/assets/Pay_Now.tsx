@@ -1,4 +1,6 @@
-export default function Pay_Now(props: any) {
+import { SVGProps } from "react";
+
+export default function Pay_Now(props: SVGProps<SVGSVGElement>) {
   return (
     <svg
       width={152}
