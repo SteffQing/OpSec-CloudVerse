@@ -1,6 +1,13 @@
-import { NOW_PAYMENTS_API_KEY, NOW_PAYMENTS_ENDPOINT } from "./const";
+// import { NOW_PAYMENTS_API_KEY, NOW_PAYMENTS_ENDPOINT } from "./const";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const { NOW_PAYMENTS_API_KEY, NOW_PAYMENTS_ENDPOINT } = process.env;
 
 export async function fetchInvoice(id: number) {
+  console.log(NOW_PAYMENTS_ENDPOINT, NOW_PAYMENTS_API_KEY);
+
   var myHeaders = new Headers();
   myHeaders.append("x-api-key", NOW_PAYMENTS_API_KEY as string);
   myHeaders.append("Content-Type", "application/json");

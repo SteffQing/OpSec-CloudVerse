@@ -1,10 +1,10 @@
 import Pay_Now from "@/assets/Pay_Now";
 import BoxWrapper from "@/components/Box";
 import useClickOutside from "@/hooks/useClickOutside";
-
 import { useQuery } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { fetchInvoice, fetchReceiptStatus } from "@/lib/now_payments";
+import Loader from "@/assets/loader";
 
 export interface ModalProps {
   title: string;
@@ -18,24 +18,16 @@ export interface ModalProps {
 export default function Modal(props: ModalProps) {
   const ref = useRef(null);
   const [recipient, setRecipient] = useState("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [receipt, setReceipt] = useState<number | null>(null);
   const { title, subtitle, id, buttonText, setModal, pay_now, placeholder } =
     props;
   useClickOutside(ref, () => setModal(null));
 
-  const { isPending, error, data, isSuccess } = useQuery({
-    queryKey: ["pay_now"],
-    queryFn: () => fetchInvoice(id),
-  });
-
-  const {
-    isLoading: isPendingReceiptFetch,
-    error: errorFetchingReceipt,
-    data: receiptResponse,
-    refetch,
-  } = useQuery({
+  const { isLoading, isError, data, refetch } = useQuery({
     queryKey: ["receipt_status"],
-    queryFn: () => fetchReceiptStatus(data.id),
-    enabled: !!isSuccess,
+    queryFn: () => fetchReceiptStatus(receipt as number),
+    enabled: false,
   });
 
   function refer_to_pay() {
@@ -49,8 +41,34 @@ export default function Modal(props: ModalProps) {
     setTimeout(() => {}, 1500);
     setModal(modal);
   }
-  function process_pay() {
-    window.open(data.invoice_url, "_blank");
+  async function process_pay() {
+    try {
+      setLoading(true);
+      let data = await fetchInvoice(id);
+      console.log(data);
+
+      setReceipt(data.id);
+      setLoading(false);
+      window.open(data.invoice_url, "_blank");
+    } catch (error) {
+      let modal = {
+        ...props,
+        title: "Error",
+        buttonText: "Retry",
+        subtitle: "There was an error in creating an invoice",
+      };
+      setModal(modal);
+      console.log(error);
+    }
+  }
+  if (isError) {
+    let modal = {
+      ...props,
+      title: "Error",
+      buttonText: "Retry",
+      subtitle: "There was an error in fetching the invoice",
+    };
+    setModal(modal);
   }
   return (
     <main className="bg-transparent z-50 fixed w-full h-full">
@@ -80,9 +98,15 @@ export default function Modal(props: ModalProps) {
               )}
               <button
                 className="bg-[#F44336] w-full rounded-md my-6 p-2 text-center"
-                onClick={pay_now ? process_pay : refer_to_pay}
+                onClick={
+                  pay_now
+                    ? process_pay
+                    : isError
+                    ? () => refetch()
+                    : refer_to_pay
+                }
               >
-                {buttonText}
+                {loading ? <Loader /> : buttonText}
               </button>
             </>
           }
