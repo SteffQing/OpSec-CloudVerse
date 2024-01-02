@@ -1,9 +1,8 @@
 import Pay_Now from "@/assets/Pay_Now";
 import BoxWrapper from "@/components/Box";
 import useClickOutside from "@/hooks/useClickOutside";
-import { useQuery } from "@tanstack/react-query";
 import { useRef, useState } from "react";
-import { fetchInvoice, fetchReceiptStatus } from "@/lib/now_payments";
+import { fetchInvoice } from "@/lib/now_payments";
 import Loader from "@/assets/loader";
 import { dispatchProxy } from "@/lib/proxies";
 import { redisClient, validateEmail } from "@/lib/utils";
@@ -131,42 +130,38 @@ export default function Modal(props: ModalProps) {
   return (
     <main className="bg-transparent z-50 fixed w-full h-full">
       <div ref={ref}>
-        <BoxWrapper
-          children={
-            <>
-              <label
-                htmlFor="email_input"
-                className="text-[#54597C] w-full block text-center"
-              >
-                {subtitle}
-              </label>
-              {pay_now ? (
-                <div className="border border-[#1D202D] rounded-md py-2 px-5 login-input my-4 break-words pr-8">
-                  <Pay_Now className="my-2" />
-                </div>
-              ) : (
-                <input
-                  type="text"
-                  id="email_input"
-                  placeholder={placeholder}
-                  className="border border-[#1D202D] rounded-md py-2 px-5 my-4 login-input"
-                  required
-                  onChange={(e) => setRecipient(e.target.value)}
-                />
-              )}
-              <button
-                className="bg-[#F44336] w-full rounded-md my-6 p-2 text-center"
-                onClick={
-                  receipt ? process_proxy : pay_now ? process_pay : refer_to_pay
-                }
-              >
-                {loading ? <Loader /> : buttonText}
-              </button>
-            </>
-          }
-          title={title}
-          width="max-w-[300px]"
-        />
+        <BoxWrapper title={title} width="max-w-[300px]">
+          <>
+            <label
+              htmlFor="email_input"
+              className="text-[#54597C] w-full block text-center"
+            >
+              {subtitle}
+            </label>
+            {pay_now ? (
+              <div className="border border-[#1D202D] rounded-md py-2 px-5 login-input my-4 break-words pr-8">
+                <Pay_Now className="my-2" />
+              </div>
+            ) : (
+              <input
+                type="text"
+                id="email_input"
+                placeholder={placeholder}
+                className="border border-[#1D202D] rounded-md py-2 px-5 my-4 login-input"
+                required
+                onChange={(e) => setRecipient(e.target.value)}
+              />
+            )}
+            <button
+              className="bg-[#F44336] w-full rounded-md my-6 p-2 text-center"
+              onClick={
+                receipt ? process_proxy : pay_now ? process_pay : refer_to_pay
+              }
+            >
+              {loading ? <Loader /> : buttonText}
+            </button>
+          </>
+        </BoxWrapper>
       </div>
     </main>
   );

@@ -9,7 +9,7 @@ import { ModalProps } from "./Modal";
 import { Line_Mobile, Line_Tablet } from "@/assets/line";
 import { cn } from "@/lib/utils";
 
-export type PlanType = "residential" | "mobile";
+export type PlanType = "residential" | "lte";
 interface Props {
   price: number;
   size: number;

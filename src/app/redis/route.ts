@@ -1,8 +1,7 @@
 import { REDIS_KEY } from "@/lib/const";
-import { NextApiRequest } from "next";
 import { createClient } from "redis";
 
-export async function GET(request: NextApiRequest) {
+export async function GET(request: Request) {
   const url = new URL(request.url as string);
 
   const action = url.searchParams.get("action") as string;

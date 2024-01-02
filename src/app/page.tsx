@@ -6,40 +6,35 @@ import Plan, { PlanType } from "../components/Plan";
 import { useState } from "react";
 import { Plans, Mobile_LTE_Data, Residential_Data } from "@/lib/data";
 import Modal, { ModalProps } from "@/components/Modal";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 export default function Home() {
   const [page, setPage] = useState(0);
   const [modal, setModal] = useState<ModalProps | null>(null);
   const data = page === 0 ? Residential_Data : Mobile_LTE_Data;
-  const planType: PlanType = page === 0 ? "residential" : "mobile";
-
-  const client = new QueryClient();
+  const planType: PlanType = page === 0 ? "residential" : "lte";
 
   return (
-    <QueryClientProvider client={client}>
-      <main className="px-4 md:px-6 pt-44 md:pt-24 bg-[#0A0B14] relative">
-        {modal && <Modal {...modal} />}
-        <TopPage page={page} setPage={setPage} />
-        {page === 0 || page === 3 ? (
-          <section className="grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 ml-0 lg:ml-0.5 my-6">
-            {data.map((plan, index) => (
-              <Plan
-                price={plan.price}
-                size={plan.size}
-                features={plan.features}
-                subtext={plan.note}
-                key={index}
-                setModal={setModal}
-                type={planType}
-              />
-            ))}
-          </section>
-        ) : (
-          <div>Coming Soon</div>
-        )}
-      </main>
-    </QueryClientProvider>
+    <main className="px-4 md:px-6 pt-44 md:pt-24 bg-[#0A0B14] relative">
+      {modal && <Modal {...modal} />}
+      <TopPage page={page} setPage={setPage} />
+      {page === 0 || page === 3 ? (
+        <section className="grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 ml-0 lg:ml-0.5 my-6">
+          {data.map((plan, index) => (
+            <Plan
+              price={plan.price}
+              size={plan.size}
+              features={plan.features}
+              subtext={plan.note}
+              key={index}
+              setModal={setModal}
+              type={planType}
+            />
+          ))}
+        </section>
+      ) : (
+        <div>Coming Soon</div>
+      )}
+    </main>
   );
 }
 

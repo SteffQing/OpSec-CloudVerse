@@ -1,6 +1,5 @@
 import { PROXY_ENDPOINT, PROXY_KEY } from "@/lib/const";
 import axios from "axios";
-import { NextApiRequest } from "next";
 
 const config = {
   headers: {
@@ -36,7 +35,7 @@ export async function POST(request: Request) {
     let ip = await getIP();
 
     data = {
-      network: "lte",
+      network: type,
       ip: ip,
       days: size,
     };

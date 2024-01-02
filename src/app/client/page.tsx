@@ -6,24 +6,24 @@ export default function Page() {
       <div className="mt-6">
         <section className="flex flex-col lg:flex-row gap-6">
           <BoxWrapper
-            children={<ProxyGenerator />}
             title="Proxy Generator"
             textAlign="text-left"
             width="lg:!m-0"
-          />
+          >
+            <ProxyGenerator />
+          </BoxWrapper>
           <BoxWrapper
-            children={
-              <input
-                type="text"
-                value="PROXIES-gtj4tywa1ppdykoya502oa-RIP"
-                className="border border-[#1D202D] rounded-md py-2 px-5 my-4 login-input"
-                readOnly
-              />
-            }
             title="Your Key"
             width="w-full max-w-[400px] !m-0"
             textAlign="text-left"
-          />
+          >
+            <input
+              type="text"
+              value="PROXIES-gtj4tywa1ppdykoya502oa-RIP"
+              className="border border-[#1D202D] rounded-md py-2 px-5 my-4 login-input"
+              readOnly
+            />
+          </BoxWrapper>
         </section>
       </div>
     </main>
@@ -39,7 +39,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/Select";
-import { Plans, countries } from "@/lib/data";
+import { countries } from "@/lib/data";
 
 function ProxyGenerator() {
   return (
