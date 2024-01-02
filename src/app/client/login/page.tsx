@@ -1,8 +1,18 @@
+"use client";
+
 import Image from "next/image";
 import LockImage from "@/assets/lock.png";
 import BoxWrapper from "@/components/Box";
+import useSessionStorage from "@/hooks/useSessionStorage";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
+  const [key, setKey] = useSessionStorage("proxy_key", "");
+  const router = useRouter();
+  // if (key) {
+  //   router.push("/client");
+  //   return;
+  // }
   return (
     <main className="px-4 md:px-6 pt-44 md:pt-24 bg-[#0A0B14] h-screen">
       <BoxWrapper title="Login">
@@ -12,6 +22,7 @@ export default function Page() {
               type="text"
               placeholder="OP-.......................-SEC"
               className="border border-[#1D202D] rounded-md py-2 px-5 my-4 login-input"
+              onChange={(e) => setKey(e.target.value)}
             />
           </span>
           <div className="flex gap-1 items-center my-2">
@@ -20,7 +31,10 @@ export default function Page() {
               Your unique authentication key.
             </span>
           </div>
-          <button className="bg-[#F44336] w-full rounded-md my-6 p-2 text-center">
+          <button
+            className="bg-[#F44336] w-full rounded-md my-6 p-2 text-center"
+            onClick={() => router.push("/client")}
+          >
             Sign In
           </button>
         </>

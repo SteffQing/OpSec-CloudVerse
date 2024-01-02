@@ -32,7 +32,11 @@ export default function Home() {
           ))}
         </section>
       ) : (
-        <div>Coming Soon</div>
+        <main className="px-4 md:px-6 pt-44 md:pt-24 relative h-[50vh]">
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-5xl text-center">
+            Coming Soon
+          </div>
+        </main>
       )}
     </main>
   );
