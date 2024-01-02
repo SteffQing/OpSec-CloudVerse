@@ -42,12 +42,13 @@ export async function POST(request: Request) {
     };
   }
 
-  console.log(data, "DATA");
-
-  let response = axios
+  let response = await axios
     .post(PROXY_ENDPOINT, data, config)
     .then((response) => response.data)
-    .catch((error) => console.log("error", error));
+    .catch((error) => {
+      console.log("error", error);
+      return { status: false, ...error };
+    });
 
-  return Response.json(response);
+  return Response.json({ ...response, ip: data.ip });
 }

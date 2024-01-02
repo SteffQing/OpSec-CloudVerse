@@ -109,20 +109,19 @@ export default function Modal(props: ModalProps) {
       setLoading(true);
       let _receipt = receipt as number;
       let response = await dispatchProxy(_receipt, recipient, data);
-      // if (response.status === false) {
-      //   toast({
-      //     title: "Error: " + response.code,
-      //     description: response.message,
-      //   });
-      //   setLoading(false);
-      //   return;
-      // }
+      if (response.status === false) {
+        toast({
+          title: "Error: " + response.code,
+          description: response.message,
+        });
+        setLoading(false);
+        return;
+      }
       await redisClient("rem", recipient, _receipt.toString());
       setLoading(false);
-      console.log(response);
       toast({
         title: "Success",
-        description: "Proxy dispatched successfully",
+        description: "Proxy dispatched successfully, please check your email",
       });
       setModal(null);
     } catch (error) {

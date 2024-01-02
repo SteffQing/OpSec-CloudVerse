@@ -5,8 +5,6 @@ import {
   EmailJS_PublicKey,
   EmailJS_Residential_Template,
   EmailJS_ServiceID,
-  PROXY_ENDPOINT,
-  PROXY_KEY,
 } from "./const";
 import { fetchReceiptStatus } from "./now_payments";
 import emailjs from "@emailjs/browser";
@@ -17,16 +15,22 @@ export async function dispatchProxy(
   recipient: string,
   data: ParamsProps
 ) {
-  const { size, price, type } = data;
+  const { size, type } = data;
   /* Fetch the receipt status */
   let receipt = await fetchReceiptStatus(paymentID);
-  // if (receipt.status === false) {
-  //   return receipt;
-  // }
+  if (receipt.status === false) {
+    return receipt;
+  }
 
   /* Purchase the Proxy */
   let response = await axios.post(API_URL + "proxy", { size, type });
   console.log(response.data, "RESPONSE");
+
+  if (response.data.status !== "success") {
+    return { code: "FAILED", ...response.data };
+  }
+
+  const order_details: ProxyResponse = response.data;
 
   /* Send the email */
   let template =
@@ -35,8 +39,17 @@ export async function dispatchProxy(
       : EmailJS_Mobile_Template;
 
   let email_response: any =
-    type === "residential" ? residential_template() : mobile_template();
-  email_response = { ...email_response, recipient };
+    type === "residential"
+      ? residential_template({
+          ...(order_details as ResidentialProxyResponse),
+          bandwidth: size,
+        })
+      : mobile_template({
+          ...(order_details as MobileLTEProxyResponse),
+          days: size,
+        });
+  const order_date = new Date().toLocaleDateString();
+  email_response = { ...email_response, recipient, order_date };
   emailjs
     .send(EmailJS_ServiceID, template, email_response, EmailJS_PublicKey)
     .then((res) => console.log(res.text))
@@ -44,13 +57,9 @@ export async function dispatchProxy(
 
   return { status: true };
 }
-function mobile_template() {
-  let order_id = 123456789;
-  let ip = "127.0.0.1";
-  let host = "localhost";
-  let port = 8080;
-  let days = 1;
-  let expire_at = new Date(Date.now() + 1000 * 60 * 60 * 24 * days);
+function mobile_template(template: LTE_Template) {
+  const { order_id, expire_at, proxy, days, ip } = template;
+  const { host, port } = proxy;
 
   return {
     order_id,
@@ -58,16 +67,13 @@ function mobile_template() {
     host,
     port,
     expire_at,
+    days,
   };
 }
 
-function residential_template() {
-  let order_id = 123456789;
-  let host = "localhost";
-  let port = 8080;
-  let username = "username";
-  let password = "password";
-  let bandwidth = 1000;
+function residential_template(template: Resi_Template) {
+  const { order_id, bandwidth, proxy } = template;
+  const { host, password, port, username } = proxy;
 
   return {
     order_id,
@@ -76,5 +82,56 @@ function residential_template() {
     username,
     password,
     bandwidth,
+  };
+}
+
+/ *  Interface Declarations * /;
+interface ResidentialProxyResponse {
+  status: string;
+  message: string;
+  reseller_name: string;
+  order_id: string;
+  price: 2;
+  proxy: {
+    host: string;
+    port: string;
+    username: string;
+    password: string;
+  };
+}
+interface MobileLTEProxyResponse {
+  status: string;
+  message: string;
+  reseller_name: string;
+  order_id: string;
+  price: 1;
+  expire_at: string;
+  ip: string;
+  proxy: {
+    host: string;
+    port: string;
+  };
+}
+
+type ProxyResponse = ResidentialProxyResponse | MobileLTEProxyResponse;
+
+interface Resi_Template {
+  order_id: string;
+  bandwidth: number;
+  proxy: {
+    host: string;
+    port: string;
+    username: string;
+    password: string;
+  };
+}
+interface LTE_Template {
+  order_id: string;
+  expire_at: string;
+  days: number;
+  ip: string;
+  proxy: {
+    host: string;
+    port: string;
   };
 }
