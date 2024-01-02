@@ -7,7 +7,7 @@ let EmailJS_Mobile_Template = "template_44v88ps";
 let EmailJS_ServiceID = "service_iiplwio";
 let EmailJS_PublicKey = "lX1bGpk8OWh32ZCQq";
 let AbstractAPI_KEY = "3385af73f07f4f758a38a373f3e3aa22";
-let API_URL = "http://localhost:3000/";
+let API_URL = "https://op-sec-cloud-verse.vercel.app/";
 let PROXY_KEY = "9ba0d360a0ba11c240d8f9f838e82f2e68ad888c";
 let PROXY_ENDPOINT = "https://reseller-api.proxies.rip/api/buy_proxy";
 
