@@ -34,6 +34,15 @@ export default function Modal(props: ModalProps) {
   useClickOutside(ref, () => setModal(null));
   const { toast } = useToast();
 
+  /* Modal data */
+  let process_pay_modal = {
+    ...props,
+    pay_now: true,
+    title: "Processing Payment",
+    buttonText: "Confirm Payment",
+    subtitle: "Click button below after payment to continue",
+  };
+
   async function refer_to_pay() {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     const isValidEmail = emailRegex.test(recipient);
@@ -59,13 +68,10 @@ export default function Modal(props: ModalProps) {
       return;
     }
     let _receipt = await redisClient("get", recipient, "");
-    if (_receipt) {
-      let receiptStatus = await fetchReceiptStatus(_receipt);
-      console.log(_receipt, " AND ", receiptStatus);
+    if (_receipt.data) {
+      await redisClient("rem", recipient, _receipt.data);
     }
-
     setLoading(false);
-    // setReceipt(_receipt);
 
     let modal = {
       ...props,
@@ -74,26 +80,18 @@ export default function Modal(props: ModalProps) {
       buttonText: "Pay",
       subtitle: "PayNow method selected",
     };
-    // setTimeout(() => {}, 1500);
     setModal(modal);
   }
   async function process_pay() {
     try {
       setLoading(true);
       let _data = await fetchInvoice(data);
-      console.log(_data);
 
       setReceipt(_data.id);
       setLoading(false);
       window.open(_data.invoice_url, "_blank");
 
-      let modal = {
-        ...props,
-        title: "Processing Payment",
-        buttonText: "Confirm Payment",
-        subtitle: "Click button below after payment to continue",
-      };
-      setModal(modal);
+      setModal(process_pay_modal);
       await redisClient("set", recipient, _data.id);
     } catch (error) {
       let modal = {
@@ -109,11 +107,24 @@ export default function Modal(props: ModalProps) {
   async function process_proxy() {
     try {
       setLoading(true);
-      let response = await dispatchProxy(receipt as number, recipient, data);
+      let _receipt = receipt as number;
+      let response = await dispatchProxy(_receipt, recipient, data);
+      // if (response.status === false) {
+      //   toast({
+      //     title: "Error: " + response.code,
+      //     description: response.message,
+      //   });
+      //   setLoading(false);
+      //   return;
+      // }
+      await redisClient("rem", recipient, _receipt.toString());
       setLoading(false);
       console.log(response);
-      let _receipt = receipt as number;
-      await redisClient("rem", recipient, _receipt.toString());
+      toast({
+        title: "Success",
+        description: "Proxy dispatched successfully",
+      });
+      setModal(null);
     } catch (error) {
       console.log(error);
     }

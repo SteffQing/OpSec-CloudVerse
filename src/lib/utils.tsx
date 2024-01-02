@@ -32,15 +32,3 @@ export async function redisClient(
       console.log(error);
     });
 }
-
-export async function getIP() {
-  return axios
-    .get("https://api.ipify.org/")
-    .then((response) => {
-      console.log(response.data);
-      return response.data;
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-}

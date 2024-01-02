@@ -33,6 +33,6 @@ export async function fetchReceiptStatus(receiptId: number): Promise<any> {
   };
 
   return fetch(NOW_PAYMENTS_ENDPOINT + "payment/" + receiptId, requestOptions)
-    .then((response) => response.text())
+    .then((response) => response.json())
     .catch((error) => console.log("error", error));
 }
