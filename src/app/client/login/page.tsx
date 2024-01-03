@@ -8,15 +8,19 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { API_URL } from "@/lib/const";
 import { useToast } from "@/components/ui/use-toast";
+import { useState } from "react";
+import Loader from "@/assets/loader";
 
 export default function Page() {
   const [key, setKey] = useSessionStorage("proxy_key", "");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
 
   async function handleLogin() {
+    setLoading(true);
     let isValid = await axios
-      .get(`${API_URL}login?order_id=${key}`)
+      .get(`${API_URL}login?key=${key}`)
       .then((response) => response.data)
       .catch((error) => {
         console.log(error);
@@ -26,6 +30,7 @@ export default function Page() {
           duration: 4000,
         });
       });
+    setLoading(false);
     if (!isValid) {
       toast({
         title: "Invalid Key",
@@ -58,7 +63,7 @@ export default function Page() {
             className="bg-[#F44336] w-full rounded-md my-6 p-2 text-center"
             onClick={handleLogin}
           >
-            Sign In
+            {loading ? <Loader /> : "Sign In"}
           </button>
         </>
       </BoxWrapper>

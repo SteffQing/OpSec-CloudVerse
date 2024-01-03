@@ -6,6 +6,7 @@ import Plan, { PlanType } from "../components/Plan";
 import { useState } from "react";
 import { Plans, Mobile_LTE_Data, Residential_Data } from "@/lib/data";
 import Modal, { ModalProps } from "@/components/Modal";
+import Placeholder from "@/components/Placeholder";
 
 export default function Home() {
   const [page, setPage] = useState(0);
@@ -32,11 +33,7 @@ export default function Home() {
           ))}
         </section>
       ) : (
-        <main className="px-4 md:px-6 pt-44 md:pt-24 relative h-[50vh]">
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-5xl text-center">
-            Coming Soon
-          </div>
-        </main>
+        <Placeholder text="Coming Soon" />
       )}
     </main>
   );

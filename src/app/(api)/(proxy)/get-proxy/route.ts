@@ -9,10 +9,10 @@ const config = {
 };
 
 export async function POST(request: Request) {
-  let { key } = await request.json();
-  const startIndex = key.indexOf("-") + 1;
-  const endIndex = key.lastIndexOf("-");
-  key = key.substring(startIndex, endIndex);
+  let { proxy_key } = await request.json();
+  const startIndex = proxy_key.indexOf("-") + 1;
+  const endIndex = proxy_key.lastIndexOf("-");
+  let key = proxy_key.substring(startIndex, endIndex);
 
   let data = { order_id: key };
 

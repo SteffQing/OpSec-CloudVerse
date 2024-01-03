@@ -116,6 +116,19 @@ interface MobileLTEProxyResponse {
   };
 }
 
+export interface MobileLTEGetProxyResponse extends MobileLTEProxyResponse {
+  current_whitelisted_ip: string;
+  proxy_key: string;
+}
+export interface ResidentialGetProxyResponse extends ResidentialProxyResponse {
+  bandwidth_available: number;
+  proxy_key: string;
+}
+
+export type GetProxyResponse =
+  | MobileLTEGetProxyResponse
+  | ResidentialGetProxyResponse;
+
 type ProxyResponse = ResidentialProxyResponse | MobileLTEProxyResponse;
 
 interface Resi_Template {

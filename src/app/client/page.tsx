@@ -4,38 +4,20 @@ import useSessionStorage from "@/hooks/useSessionStorage";
 import BoxWrapper from "@/components/Box";
 
 export default function Page() {
-  const [key, setKey] = useSessionStorage("proxy_key", "");
-  const { toast } = useToast();
+  const [proxy_key] = useSessionStorage("proxy_key", "");
 
   const router = useRouter();
-  if (!key) {
+  if (!proxy_key) {
     router.push("/client/login");
     return;
   }
+  const client = new QueryClient();
 
-  const queryKey = ["proxy_key"];
-
-  const { data, isError, isLoading } = useQuery({
-    queryKey,
-    queryFn: () =>
-      axios
-        .post(`${API_URL}get-proxy`, { key })
-        .then((response) => response.data)
-        .catch((error) => {
-          console.log(error);
-          toast({
-            title: "Error Key",
-            description: "There was an error fetching your key.",
-            duration: 4000,
-          });
-        }),
-  });
-  console.log(data);
-
-  if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>Error</div>;
-
-  return <ResidentialProxy key={key} />;
+  return (
+    <QueryClientProvider client={client}>
+      <ClientPage proxy_key={proxy_key} />
+    </QueryClientProvider>
+  );
 }
 
 import { Doc_Copy, Import } from "@/assets/client_icons";
@@ -47,14 +29,68 @@ import {
   SelectValue,
 } from "@/components/ui/Select";
 import { countries } from "@/lib/data";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useCopyToClipboard from "@/hooks/useCopyToClipboard";
 import { useToast } from "@/components/ui/use-toast";
-import { useQuery } from "@tanstack/react-query";
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+} from "@tanstack/react-query";
 import axios from "axios";
 import { API_URL } from "@/lib/const";
+import Placeholder from "@/components/Placeholder";
+import {
+  GetProxyResponse,
+  MobileLTEGetProxyResponse,
+  ResidentialGetProxyResponse,
+} from "@/lib/proxies";
+import {
+  SchemeType,
+  Type,
+  handleAmount,
+  handleCountry,
+  handleScheme,
+  handleType,
+} from "./generateProxies";
 
-function ResidentialProxy({ key }: { key: string }) {
+function ClientPage({ proxy_key }: { proxy_key: string }) {
+  const { toast } = useToast();
+
+  const { data, isError, isLoading } = useQuery({
+    queryKey: [proxy_key],
+    queryFn: () =>
+      axios
+        .post(`${API_URL}get-proxy`, { proxy_key })
+        .then((response) => response.data)
+        .catch((error) => {
+          console.log(error);
+          toast({
+            title: "Key Error",
+            description: "There was an error fetching your key.",
+            duration: 4000,
+          });
+        }),
+  });
+
+  if (isLoading) return <Placeholder text="Loading..." className="h-screen" />;
+  if (isError) return <Placeholder text="Error" className="h-screen" />;
+
+  let _data: GetProxyResponse = data;
+  _data = { ..._data, proxy_key };
+  let isResidential = "bandwidth_available" in _data;
+
+  return isResidential ? (
+    <ResidentialProxy {...(_data as ResidentialGetProxyResponse)} />
+  ) : (
+    <MobileLTE {...(_data as MobileLTEGetProxyResponse)} />
+  );
+}
+
+function ResidentialProxy(data: ResidentialGetProxyResponse) {
+  const { proxy_key } = data;
+  console.log(data);
+
   return (
     <main className="px-4 md:px-6 pt-44 md:pt-24 bg-[#0A0B14]">
       <div className="mt-6">
@@ -64,7 +100,7 @@ function ResidentialProxy({ key }: { key: string }) {
             textAlign="text-left"
             width="lg:!m-0"
           >
-            <ProxyGenerator />
+            <ProxyGenerator {...data} />
           </BoxWrapper>
           <BoxWrapper
             title="Your Key"
@@ -73,7 +109,7 @@ function ResidentialProxy({ key }: { key: string }) {
           >
             <input
               type="text"
-              value={key as string}
+              value={proxy_key}
               className="border border-[#1D202D] rounded-md py-2 px-5 my-4 login-input"
               readOnly
             />
@@ -84,13 +120,23 @@ function ResidentialProxy({ key }: { key: string }) {
   );
 }
 
-function ProxyGenerator() {
-  const [proxy, setProxy] = useState("");
+function ProxyGenerator(data: ResidentialGetProxyResponse) {
+  const { proxy: _proxy } = data;
+  let { host, port, password, username } = _proxy;
+  let initialProxy = `${host}:${port}:${username}:${password}`;
+  const [proxy, setProxy] = useState<string | string[]>(initialProxy);
+  const [country, setCountry] = useState("Random");
+  const [amount, setAmount] = useState(0);
+  const [type, setType] = useState<Type>("rotating");
+  const [scheme, setScheme] = useState<SchemeType>("host:port:user:pass");
+  const prevValues = useRef({ country, amount, type, scheme });
+
   const [, copy] = useCopyToClipboard();
   const { toast } = useToast();
-  const generateProxyKey = async () => {
-    setProxy("resi1.proxies.rip:1337:gtj4tywa1ppdykoya502oa:dU7sYgLHkalnkIrx");
-    let copied = await copy(proxy);
+
+  const copyKey = async () => {
+    let toCopy = typeof proxy === "string" ? proxy : proxy.join("\n");
+    let copied = await copy(toCopy);
     if (copied) {
       toast({
         title: "Proxy Key copied",
@@ -99,17 +145,76 @@ function ProxyGenerator() {
       });
     }
   };
+  useEffect(() => {
+    console.log(country, amount, type, scheme);
+    if (prevValues.current.country !== country) {
+      if (typeof proxy === "string") {
+        setProxy(handleCountry(initialProxy, country, scheme, _proxy));
+      } else {
+        setProxy(
+          proxy.map((p) => handleCountry(initialProxy, country, scheme, _proxy))
+        );
+      }
+      prevValues.current.country = country;
+    }
+    if (prevValues.current.amount !== amount) {
+      if (amount < 2) {
+        setProxy(handleAmount(proxy as string, amount, scheme, _proxy));
+      } else {
+        let proxies: string[] = [];
+        for (let i = 1; i < amount; i++) {
+          let _p = handleAmount(initialProxy, amount, scheme, _proxy) as string;
+          proxies.push(_p);
+        }
+        setProxy(proxies);
+      }
+      prevValues.current.amount = amount;
+    }
+    if (prevValues.current.type !== type) {
+      if (typeof proxy === "string") {
+        setProxy(handleType(initialProxy, type, _proxy, amount, scheme));
+      } else {
+        let proxies: string[] = [];
+        for (let p of proxy) {
+          let _p = handleType(
+            initialProxy,
+            type,
+            _proxy,
+            amount,
+            scheme
+          ) as string;
+          proxies.push(_p);
+        }
+        setProxy(proxies);
+      }
+      prevValues.current.type = type;
+    }
+    if (prevValues.current.scheme !== scheme) {
+      let _scheme = prevValues.current.scheme;
+      if (typeof proxy === "string") {
+        setProxy(handleScheme(initialProxy, _proxy, _scheme, scheme));
+      } else {
+        setProxy(
+          proxy.map((p) => handleScheme(initialProxy, _proxy, _scheme, scheme))
+        );
+      }
+      prevValues.current.scheme = scheme;
+    }
+  }, [country, amount, type, scheme]);
+
+  // console.log(proxy);
+
   return (
     <div className="flex flex-col">
       <aside className="proxy_aside md:flex gap-2">
         <section className="flex gap-2 mb-5 md:mb-0 w-full">
-          <Select>
+          <Select onValueChange={(value) => setCountry(value)}>
             <SelectTrigger className="w-[160px]">
               <SelectValue placeholder="Select Country" />
             </SelectTrigger>
             <SelectContent className="bg-black text-white">
               {countries.map((country) => (
-                <SelectItem value={country.toLowerCase()} key={country}>
+                <SelectItem value={country} key={country}>
                   {country}
                 </SelectItem>
               ))}
@@ -121,18 +226,26 @@ function ProxyGenerator() {
               type="number"
               placeholder="Amount"
               className="border border-[#1D202D] rounded-md py-2 px-5 login-input"
+              onChange={(e) => setAmount(Number(e.target.value))}
+              value={amount > 0 ? amount : ""}
             />
-            <span className="absolute top-1/2 -translate-y-1/2 right-4 text-xl">
+            <span
+              className="absolute top-1/2 -translate-y-1/2 right-4 text-xl"
+              onClick={() => setAmount(amount + 1)}
+            >
               +
             </span>
-            <span className="absolute top-1/2 -translate-y-1/2 right-10 text-xl">
+            <span
+              className="absolute top-1/2 -translate-y-1/2 right-10 text-xl"
+              onClick={() => setAmount(amount - 1)}
+            >
               -
             </span>
           </div>
         </section>
 
         <section className="flex gap-2 w-full">
-          <Select>
+          <Select onValueChange={(value: Type) => setType(value)}>
             <SelectTrigger className="w-[120px]">
               <SelectValue placeholder="Type" />
             </SelectTrigger>
@@ -142,30 +255,103 @@ function ProxyGenerator() {
             </SelectContent>
           </Select>
 
-          <Select>
+          <Select onValueChange={(value: SchemeType) => setScheme(value)}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Scheme Format" />
             </SelectTrigger>
             <SelectContent className="bg-black text-white">
-              <SelectItem value="1">host:port:user:pass</SelectItem>
-              <SelectItem value="2">user:pass@host:port</SelectItem>
-              <SelectItem value="3">user:pass:host:port</SelectItem>
+              <SelectItem value="host:port:user:pass">
+                host:port:user:pass
+              </SelectItem>
+              <SelectItem value="user:pass@host:port">
+                user:pass@host:port
+              </SelectItem>
+              <SelectItem value="user:pass:host:port">
+                user:pass:host:port
+              </SelectItem>
             </SelectContent>
           </Select>
         </section>
       </aside>
 
-      <aside className="my-4 relative">
+      <aside className="my-4 relative max-h-[64px]">
         <span className="absolute z-10 bg-[#F44336] top-0 left-0 w-4 h-full rounded-r-lg"></span>
-        <div className="border border-[#1D202D] rounded-md py-2 px-5 login-input break-words pr-8">
-          {proxy}
+        <div className="border overflow-auto border-[#1D202D] rounded-md py-2 px-5 login-input break-words pr-8 max-h-[64px]">
+          {typeof proxy === "string" ? proxy : proxy.join("\n")}
         </div>
         <Doc_Copy
           className="absolute top-[35%] min-[600px]:top-1/2 -translate-y-1/2 right-2 min-[600px]:right-8"
-          onClick={generateProxyKey}
+          onClick={copyKey}
         />
         <Import className="absolute top-[65%] min-[600px]:top-1/2 -translate-y-1/2 right-2" />
       </aside>
     </div>
+  );
+}
+
+function MobileLTE(data: MobileLTEGetProxyResponse) {
+  const [newIP, setNewIP] = useState("");
+  const { proxy_key, current_whitelisted_ip, expire_at } = data;
+  return (
+    <main className="px-4 md:px-6 pt-44 md:pt-24 bg-[#0A0B14]">
+      <div className="mt-6">
+        <section className="flex flex-col lg:flex-row gap-6">
+          <BoxWrapper title="Proxy List" textAlign="text-left" width="lg:!m-0">
+            <div>
+              <input
+                type="text"
+                value={current_whitelisted_ip}
+                className="border border-[#1D202D] rounded-md py-2 px-5 my-4 login-input"
+                readOnly
+              />
+              <button className="bg-[#1D202D] rounded-md py-2 px-5 my-4 login-input">
+                Copy
+              </button>
+            </div>
+          </BoxWrapper>
+          <BoxWrapper
+            title="Whitelisted IP"
+            width="w-full max-w-[400px] !m-0"
+            textAlign="text-left"
+          >
+            <div className="flex gap-3">
+              <input
+                type="text"
+                value={newIP}
+                className="border border-[#1D202D] rounded-md py-2 px-5 my-4 login-input"
+                onChange={(e) => setNewIP(e.target.value)}
+              />
+              <button className="bg-[#1D202D] rounded-md py-2 px-5 my-4 login-input">
+                Edit
+              </button>
+            </div>
+          </BoxWrapper>
+          <BoxWrapper
+            title="Expiry Date"
+            width="w-full max-w-[400px] !m-0"
+            textAlign="text-left"
+          >
+            <input
+              type="text"
+              value={expire_at}
+              className="border border-[#1D202D] rounded-md py-2 px-5 my-4 login-input"
+              readOnly
+            />
+          </BoxWrapper>
+          <BoxWrapper
+            title="Your Key"
+            width="w-full max-w-[400px] !m-0"
+            textAlign="text-left"
+          >
+            <input
+              type="text"
+              value={proxy_key}
+              className="border border-[#1D202D] rounded-md py-2 px-5 my-4 login-input"
+              readOnly
+            />
+          </BoxWrapper>
+        </section>
+      </div>
+    </main>
   );
 }

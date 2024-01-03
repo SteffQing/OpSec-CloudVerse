@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "./Navbar";
 import { Toaster } from "@/components/ui/toaster";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 export const metadata: Metadata = {
   title: "OpSec CloudVerse",
@@ -15,15 +14,12 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const client = new QueryClient();
   return (
     <html lang="en">
       <body>
-        <QueryClientProvider client={client}>
-          <Navbar />
-          {children}
-          <Toaster />
-        </QueryClientProvider>
+        <Navbar />
+        {children}
+        <Toaster />
       </body>
     </html>
   );
