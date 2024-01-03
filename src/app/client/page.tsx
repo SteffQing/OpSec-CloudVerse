@@ -45,14 +45,7 @@ import {
   MobileLTEGetProxyResponse,
   ResidentialGetProxyResponse,
 } from "@/lib/proxies";
-import {
-  SchemeType,
-  Type,
-  handleAmount,
-  handleCountry,
-  handleScheme,
-  handleType,
-} from "./generateProxies";
+import { SchemeType, Type, generateProxies } from "./generateProxies";
 
 function ClientPage({ proxy_key }: { proxy_key: string }) {
   const { toast } = useToast();
@@ -89,7 +82,6 @@ function ClientPage({ proxy_key }: { proxy_key: string }) {
 
 function ResidentialProxy(data: ResidentialGetProxyResponse) {
   const { proxy_key } = data;
-  console.log(data);
 
   return (
     <main className="px-4 md:px-6 pt-44 md:pt-24 bg-[#0A0B14]">
@@ -124,12 +116,12 @@ function ProxyGenerator(data: ResidentialGetProxyResponse) {
   const { proxy: _proxy } = data;
   let { host, port, password, username } = _proxy;
   let initialProxy = `${host}:${port}:${username}:${password}`;
-  const [proxy, setProxy] = useState<string | string[]>(initialProxy);
+  const [proxy, setProxy] = useState<string[]>([initialProxy]);
   const [country, setCountry] = useState("Random");
   const [amount, setAmount] = useState(0);
   const [type, setType] = useState<Type>("rotating");
   const [scheme, setScheme] = useState<SchemeType>("host:port:user:pass");
-  const prevValues = useRef({ country, amount, type, scheme });
+  const prevScheme = useRef(scheme);
 
   const [, copy] = useCopyToClipboard();
   const { toast } = useToast();
@@ -145,64 +137,30 @@ function ProxyGenerator(data: ResidentialGetProxyResponse) {
       });
     }
   };
+  const downloadTxtFile = () => {
+    const element = document.createElement("a");
+    const file = new Blob([proxy.join("\n")], {
+      type: "text/plain;charset=utf-8",
+    });
+    element.href = URL.createObjectURL(file);
+    element.download = "proxies.txt";
+    document.body.appendChild(element);
+    element.click();
+  };
   useEffect(() => {
-    console.log(country, amount, type, scheme);
-    if (prevValues.current.country !== country) {
-      if (typeof proxy === "string") {
-        setProxy(handleCountry(initialProxy, country, scheme, _proxy));
-      } else {
-        setProxy(
-          proxy.map((p) => handleCountry(initialProxy, country, scheme, _proxy))
-        );
-      }
-      prevValues.current.country = country;
-    }
-    if (prevValues.current.amount !== amount) {
-      if (amount < 2) {
-        setProxy(handleAmount(proxy as string, amount, scheme, _proxy));
-      } else {
-        let proxies: string[] = [];
-        for (let i = 1; i < amount; i++) {
-          let _p = handleAmount(initialProxy, amount, scheme, _proxy) as string;
-          proxies.push(_p);
-        }
-        setProxy(proxies);
-      }
-      prevValues.current.amount = amount;
-    }
-    if (prevValues.current.type !== type) {
-      if (typeof proxy === "string") {
-        setProxy(handleType(initialProxy, type, _proxy, amount, scheme));
-      } else {
-        let proxies: string[] = [];
-        for (let p of proxy) {
-          let _p = handleType(
-            initialProxy,
-            type,
-            _proxy,
-            amount,
-            scheme
-          ) as string;
-          proxies.push(_p);
-        }
-        setProxy(proxies);
-      }
-      prevValues.current.type = type;
-    }
-    if (prevValues.current.scheme !== scheme) {
-      let _scheme = prevValues.current.scheme;
-      if (typeof proxy === "string") {
-        setProxy(handleScheme(initialProxy, _proxy, _scheme, scheme));
-      } else {
-        setProxy(
-          proxy.map((p) => handleScheme(initialProxy, _proxy, _scheme, scheme))
-        );
-      }
-      prevValues.current.scheme = scheme;
-    }
+    let _amount = amount < 2 ? 1 : amount;
+    let proxies = generateProxies(
+      proxy[0],
+      type,
+      _amount,
+      scheme,
+      prevScheme.current,
+      country,
+      _proxy
+    );
+    setProxy(proxies);
+    prevScheme.current = scheme;
   }, [country, amount, type, scheme]);
-
-  // console.log(proxy);
 
   return (
     <div className="flex flex-col">
@@ -277,13 +235,16 @@ function ProxyGenerator(data: ResidentialGetProxyResponse) {
       <aside className="my-4 relative max-h-[64px]">
         <span className="absolute z-10 bg-[#F44336] top-0 left-0 w-4 h-full rounded-r-lg"></span>
         <div className="border overflow-auto border-[#1D202D] rounded-md py-2 px-5 login-input break-words pr-8 max-h-[64px]">
-          {typeof proxy === "string" ? proxy : proxy.join("\n")}
+          {proxy.join("\n")}
         </div>
         <Doc_Copy
           className="absolute top-[35%] min-[600px]:top-1/2 -translate-y-1/2 right-2 min-[600px]:right-8"
           onClick={copyKey}
         />
-        <Import className="absolute top-[65%] min-[600px]:top-1/2 -translate-y-1/2 right-2" />
+        <Import
+          className="absolute top-[65%] min-[600px]:top-1/2 -translate-y-1/2 right-2"
+          onClick={downloadTxtFile}
+        />
       </aside>
     </div>
   );

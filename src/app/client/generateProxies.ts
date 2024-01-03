@@ -1,100 +1,44 @@
-export function handleCountry(
-  proxy: string,
+function handleCountry(
+  extractProxy: string,
   country: string,
   scheme: SchemeType,
-  _proxy: _ProxyType
+  _proxy: _ProxyType,
+  type: Type
 ) {
-  const { remainingProxy } = extractHostPortUserPass_and_RemainingProxy(
-    proxy,
-    scheme,
-    _proxy
-  );
-  if (country === "Random") {
-    if (remainingProxy.includes("_country-")) {
-      let index1 = remainingProxy.indexOf("_");
-      let index2 = remainingProxy.lastIndexOf("_");
-      if (index1 === index2) {
-        return formatProxy(_proxy, scheme, "");
-      } else {
-        let _remainingProxy = remainingProxy.substring(index2);
-        return formatProxy(_proxy, scheme, _remainingProxy);
-      }
-    }
-    return proxy;
+  let _extractProxy = "";
+  if (extractProxy.includes("_country-")) {
+    let index = extractProxy.lastIndexOf("_");
+    // If the index is 0, then it means that the proxy is only country based else there is a session
+    _extractProxy = index === 0 ? "" : extractProxy.substring(index);
   } else {
-    if (remainingProxy.includes("_country-")) {
-      let index1 = remainingProxy.indexOf("_");
-      let index2 = remainingProxy.lastIndexOf("_");
-      if (index1 === index2) {
-        let newCountryProxy = "_country-" + country;
-        return formatProxy(_proxy, scheme, newCountryProxy);
-      } else {
-        let newCountryProxy = "_country-" + country;
-        let _remainingProxy = remainingProxy.substring(index2);
-        let newProxy = newCountryProxy + _remainingProxy;
-        return formatProxy(_proxy, scheme, newProxy);
-      }
-    } else {
-      let newCountryProxy = "_country-" + country;
-      let newProxy = newCountryProxy + remainingProxy;
-      return formatProxy(_proxy, scheme, newProxy);
-    }
+    // a session might exist, or extractProxy is empty, assign to _
+    _extractProxy = extractProxy;
   }
+  let newProxy = country === "Random" ? "" : `_country-${country}`;
+  let proxy = newProxy + _extractProxy;
+  return handleType(proxy, type, _proxy, scheme);
 }
-export function handleAmount(
-  proxy: string,
-  amount: number,
-  scheme: SchemeType,
-  _proxy: _ProxyType
-): string | string[] {
-  if (amount === 0 || amount === 1) {
-    return proxy;
-  }
-  const { remainingProxy } = extractHostPortUserPass_and_RemainingProxy(
-    proxy,
-    scheme,
-    _proxy
-  );
-  const proxies = [proxy];
-  for (let i = 1; i < amount; i++) {
-    let newSession = generateRandomString();
-    if (remainingProxy.includes("_session-")) {
-      let index = remainingProxy.indexOf("_session-");
-      let _remainingProxy = remainingProxy.substring(0, index);
-      let newProxy = _remainingProxy + `_session-` + newSession;
-      proxies.push(formatProxy(_proxy, scheme, newProxy));
-    } else {
-      //   let newProxy = remainingProxy + `_session-` + newSession;
-      proxies.push(formatProxy(_proxy, scheme, remainingProxy));
-    }
-  }
-  return proxies;
-}
+
 export type Type = "rotating" | "static";
-export function handleType(
-  proxy: string,
+function handleType(
+  extractProxy: string,
   type: Type,
   _proxy: _ProxyType,
-  amount: number,
   scheme: SchemeType
 ) {
-  if (type === "rotating") {
-    if (amount === 0 || amount === 1) {
-      return proxy;
-    } else {
-      let proxies = [proxy];
-      for (let i = 1; i < amount; i++) {
-        proxies.push(proxy);
-      }
-      return proxies;
-    }
+  let session = generateRandomString();
+  let _extractProxy = "";
+  if (extractProxy.includes("_session-")) {
+    let index = extractProxy.lastIndexOf("_");
+    // If the index is 0, then it means that the proxy is only session based
+    _extractProxy = index === 0 ? "" : extractProxy.substring(0, index);
   } else {
-    if (amount === 0 || amount === 1) {
-      return proxy;
-    } else {
-      return handleAmount(proxy, amount, scheme, _proxy);
-    }
+    // a session might exist, or extractProxy is empty, assign to _
+    _extractProxy = extractProxy;
   }
+  let newProxy = type === "rotating" ? "" : `_session-${session}`;
+  let proxy = _extractProxy + newProxy;
+  return handleScheme(proxy, _proxy, scheme);
 }
 
 export type SchemeType =
@@ -107,65 +51,15 @@ interface _ProxyType {
   username: string;
   password: string;
 }
-export function handleScheme(
-  proxy: string,
+function handleScheme(
+  extractProxy: string,
   _proxy: _ProxyType,
-  prevScheme: SchemeType,
   scheme: SchemeType
 ) {
-  const { host, password, port, username } = _proxy;
-  if (prevScheme === "host:port:user:pass") {
-    if (proxy === `${host}:${port}:${username}:${password}`) {
-      if (scheme === "user:pass@host:port") {
-        return `${username}:${password}@${host}:${port}`;
-      }
-      return `${username}:${password}:${host}:${port}`;
-    }
-    // Else, it has some proxy inbetween
-    let index = proxy.indexOf(password) + password.length;
-    let newProxy = proxy.substring(index);
-    if (scheme === "user:pass@host:port") {
-      return `${username}:${password}${newProxy}@${host}:${port}`;
-    }
-    return `${username}:${password}${newProxy}:${host}:${port}`;
-  } else if (prevScheme === "user:pass@host:port") {
-    if (proxy === `${username}:${password}@${host}:${port}`) {
-      if (scheme === "host:port:user:pass") {
-        return `${host}:${port}:${username}:${password}`;
-      }
-      return `${username}:${password}:${host}:${port}`;
-    }
-    let userPassIndex = proxy.indexOf(password) + password.length;
-    let newProxy = proxy.substring(userPassIndex);
-    let hostPortIndex = newProxy.indexOf(`@${host}:${port}`);
-    let remainingProxy = newProxy.substring(0, hostPortIndex);
-    if (scheme === "host:port:user:pass") {
-      return `${host}:${port}:${username}:${password}${remainingProxy}`;
-    }
-    return `${username}:${password}${remainingProxy}:${host}:${port}`;
-  } else if (prevScheme === "user:pass:host:port") {
-    if (proxy === `${username}:${password}:${host}:${port}`) {
-      if (scheme === "host:port:user:pass") {
-        return `${host}:${port}:${username}:${password}`;
-      }
-      return `${username}:${password}@${host}:${port}`;
-    }
-    let indexH = proxy.indexOf(host) - 1;
-    let indexP = proxy.indexOf(password) + password.length;
-    let newProxy = proxy.substring(indexP, indexH);
-    if (scheme === "host:port:user:pass") {
-      return `${host}:${port}:${username}:${password}${newProxy}`;
-    }
-    return `${username}:${password}${newProxy}@${host}:${port}`;
-  }
-  return proxy;
+  return formatProxy(_proxy, scheme, extractProxy);
 }
 
-function extractHostPortUserPass_and_RemainingProxy(
-  proxy: string,
-  scheme: SchemeType,
-  _proxy: _ProxyType
-) {
+function extractProxy(proxy: string, scheme: SchemeType, _proxy: _ProxyType) {
   let remainingProxy = "";
   let { host, password, port, username } = _proxy;
   if (scheme === "host:port:user:pass") {
@@ -181,7 +75,7 @@ function extractHostPortUserPass_and_RemainingProxy(
     let _index = proxy.indexOf(host) - 1;
     remainingProxy = proxy.substring(index, _index);
   }
-  return { host, port, username, password, remainingProxy };
+  return remainingProxy;
 }
 
 function formatProxy(
@@ -189,6 +83,8 @@ function formatProxy(
   scheme: SchemeType,
   remainingProxy: string
 ) {
+  console.log(remainingProxy, "formatProxy");
+
   const { host, password, port, username } = _proxy;
   if (scheme === "host:port:user:pass") {
     return `${host}:${port}:${username}:${password}${remainingProxy}`;
@@ -207,4 +103,33 @@ function generateRandomString() {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
+}
+
+export function generateProxies(
+  proxy: string,
+  type: Type,
+  amount: number,
+  scheme: SchemeType,
+  prevScheme: SchemeType,
+  country: string,
+  _proxy: _ProxyType
+): string[] {
+  const proxies: string[] = [];
+  let _amount = amount;
+  let _extractProxy = extractProxy(proxy, prevScheme, _proxy);
+
+  /* With a while loop, iterate over every amount to generate a proxy and store in the proxies array */
+  while (_amount > 0) {
+    const newProxy = handleCountry(
+      _extractProxy,
+      country,
+      scheme,
+      _proxy,
+      type
+    );
+    proxies.push(newProxy);
+    _amount--;
+  }
+
+  return proxies;
 }
