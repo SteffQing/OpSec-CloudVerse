@@ -5,12 +5,56 @@ import BoxWrapper from "@/components/Box";
 
 export default function Page() {
   const [key, setKey] = useSessionStorage("proxy_key", "");
+  const { toast } = useToast();
 
   const router = useRouter();
   if (!key) {
     router.push("/client/login");
     return;
   }
+
+  const queryKey = ["proxy_key"];
+
+  const { data, isError, isLoading } = useQuery({
+    queryKey,
+    queryFn: () =>
+      axios
+        .post(`${API_URL}get-proxy`, { key })
+        .then((response) => response.data)
+        .catch((error) => {
+          console.log(error);
+          toast({
+            title: "Error Key",
+            description: "There was an error fetching your key.",
+            duration: 4000,
+          });
+        }),
+  });
+  console.log(data);
+
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error</div>;
+
+  return <ResidentialProxy key={key} />;
+}
+
+import { Doc_Copy, Import } from "@/assets/client_icons";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/Select";
+import { countries } from "@/lib/data";
+import { useState } from "react";
+import useCopyToClipboard from "@/hooks/useCopyToClipboard";
+import { useToast } from "@/components/ui/use-toast";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { API_URL } from "@/lib/const";
+
+function ResidentialProxy({ key }: { key: string }) {
   return (
     <main className="px-4 md:px-6 pt-44 md:pt-24 bg-[#0A0B14]">
       <div className="mt-6">
@@ -39,19 +83,6 @@ export default function Page() {
     </main>
   );
 }
-
-import { Doc_Copy, Import } from "@/assets/client_icons";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/Select";
-import { countries } from "@/lib/data";
-import { useState } from "react";
-import useCopyToClipboard from "@/hooks/useCopyToClipboard";
-import { useToast } from "@/components/ui/use-toast";
 
 function ProxyGenerator() {
   const [proxy, setProxy] = useState("");

@@ -9,7 +9,8 @@ let EmailJS_PublicKey = "lX1bGpk8OWh32ZCQq";
 let AbstractAPI_KEY = "3385af73f07f4f758a38a373f3e3aa22";
 let API_URL = "https://op-sec-cloud-verse.vercel.app/";
 let PROXY_KEY = "9ba0d360a0ba11c240d8f9f838e82f2e68ad888c";
-let PROXY_ENDPOINT = "https://reseller-api.proxies.rip/api/buy_proxy";
+let BUY_PROXY_ENDPOINT = "https://reseller-api.proxies.rip/api/buy_proxy";
+let GET_PROXY_ENDPOINT = "https://reseller-api.proxies.rip/api/get_order_info";
 
 export {
   REDIS_KEY,
@@ -21,6 +22,7 @@ export {
   AbstractAPI_KEY,
   API_URL,
   PROXY_KEY,
-  PROXY_ENDPOINT,
+  BUY_PROXY_ENDPOINT,
+  GET_PROXY_ENDPOINT,
   EmailJS_PublicKey,
 };

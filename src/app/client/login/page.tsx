@@ -5,14 +5,37 @@ import LockImage from "@/assets/lock.png";
 import BoxWrapper from "@/components/Box";
 import useSessionStorage from "@/hooks/useSessionStorage";
 import { useRouter } from "next/navigation";
+import axios from "axios";
+import { API_URL } from "@/lib/const";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function Page() {
   const [key, setKey] = useSessionStorage("proxy_key", "");
   const router = useRouter();
-  // if (key) {
-  //   router.push("/client");
-  //   return;
-  // }
+  const { toast } = useToast();
+
+  async function handleLogin() {
+    let isValid = await axios
+      .get(`${API_URL}login?order_id=${key}`)
+      .then((response) => response.data)
+      .catch((error) => {
+        console.log(error);
+        toast({
+          title: "Error Key",
+          description: "There was an error fetching your key.",
+          duration: 4000,
+        });
+      });
+    if (!isValid) {
+      toast({
+        title: "Invalid Key",
+        description: "Please enter a valid key.",
+        duration: 4000,
+      });
+      return;
+    }
+    router.push("/client");
+  }
   return (
     <main className="px-4 md:px-6 pt-44 md:pt-24 bg-[#0A0B14] h-screen">
       <BoxWrapper title="Login">
@@ -20,7 +43,7 @@ export default function Page() {
           <span className="login-input_span relative">
             <input
               type="text"
-              placeholder="OP-.......................-SEC"
+              placeholder="OPSEC-.......................-SW"
               className="border border-[#1D202D] rounded-md py-2 px-5 my-4 login-input"
               onChange={(e) => setKey(e.target.value)}
             />
@@ -33,7 +56,7 @@ export default function Page() {
           </div>
           <button
             className="bg-[#F44336] w-full rounded-md my-6 p-2 text-center"
-            onClick={() => router.push("/client")}
+            onClick={handleLogin}
           >
             Sign In
           </button>

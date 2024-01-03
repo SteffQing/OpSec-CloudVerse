@@ -1,4 +1,4 @@
-import { PROXY_ENDPOINT, PROXY_KEY } from "@/lib/const";
+import { BUY_PROXY_ENDPOINT, PROXY_KEY } from "@/lib/const";
 import axios from "axios";
 
 const config = {
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
   }
 
   let response = await axios
-    .post(PROXY_ENDPOINT, data, config)
+    .post(BUY_PROXY_ENDPOINT, data, config)
     .then((response) => response.data)
     .catch((error) => {
       console.log("error", error);
