@@ -9,7 +9,6 @@ import {
 import { fetchReceiptStatus } from "./now_payments";
 import emailjs from "@emailjs/browser";
 import axios from "axios";
-import { redisClient } from "./utils";
 
 export async function dispatchProxy(
   paymentID: number,
@@ -33,7 +32,6 @@ export async function dispatchProxy(
 
   const order_details: ProxyResponse = response.data;
   const proxy_key = `OPSEC-${order_details.order_id}-SW`;
-  await redisClient("set", "Proxies", proxy_key);
 
   /* Send the email */
   let template =
