@@ -17,6 +17,8 @@ export default function Page() {
   const router = useRouter();
   const { toast } = useToast();
 
+  let design = "DEX";
+
   async function handleLogin() {
     setLoading(true);
     let isValid = await axios

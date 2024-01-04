@@ -2,24 +2,6 @@
 import { useRouter } from "next/navigation";
 import useSessionStorage from "@/hooks/useSessionStorage";
 import BoxWrapper from "@/components/Box";
-
-export default function Page() {
-  const [proxy_key] = useSessionStorage("proxy_key", "");
-
-  const router = useRouter();
-  if (!proxy_key) {
-    router.push("/client/login");
-    return;
-  }
-  const client = new QueryClient();
-
-  return (
-    <QueryClientProvider client={client}>
-      <ClientPage proxy_key={proxy_key} />
-    </QueryClientProvider>
-  );
-}
-
 import { Doc_Copy, Import } from "@/assets/client_icons";
 import {
   Select,
@@ -32,11 +14,6 @@ import { countries } from "@/lib/data";
 import { useEffect, useRef, useState } from "react";
 import useCopyToClipboard from "@/hooks/useCopyToClipboard";
 import { useToast } from "@/components/ui/use-toast";
-import {
-  QueryClient,
-  QueryClientProvider,
-  useQuery,
-} from "@tanstack/react-query";
 import axios from "axios";
 import { API_URL } from "@/lib/const";
 import Placeholder from "@/components/Placeholder";
@@ -45,31 +22,46 @@ import {
   MobileLTEGetProxyResponse,
   ResidentialGetProxyResponse,
 } from "@/lib/proxies";
-import { SchemeType, Type, generateProxies } from "./generateProxies";
+import { Type, generateProxies, SchemeType } from "@/lib/generateProxies";
 
-function ClientPage({ proxy_key }: { proxy_key: string }) {
+export default function Page() {
+  const [proxy_key] = useSessionStorage("proxy_key", "");
   const { toast } = useToast();
+  const [data, setData] = useState<GetProxyResponse>();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
 
-  const { data, isError, isLoading } = useQuery({
-    queryKey: [proxy_key],
-    queryFn: () =>
-      axios
-        .post(`${API_URL}get-proxy`, { proxy_key })
-        .then((response) => response.data)
-        .catch((error) => {
-          console.log(error);
-          toast({
-            title: "Key Error",
-            description: "There was an error fetching your key.",
-            duration: 4000,
-          });
-        }),
-  });
+  useEffect(() => {
+    if (!proxy_key) return;
+    setIsLoading(true);
+    axios
+      .post(`${API_URL}get-proxy`, { proxy_key })
+      .then((response) => {
+        setData(response.data);
+      })
+      .catch((error) => {
+        setIsError(true);
+        toast({
+          title: "Error",
+          description: "There was an error fetching your key.",
+          duration: 4000,
+        });
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, []);
+
+  const router = useRouter();
+  if (!proxy_key) {
+    router.push("/client/login");
+    return;
+  }
 
   if (isLoading) return <Placeholder text="Loading..." className="h-screen" />;
   if (isError) return <Placeholder text="Error" className="h-screen" />;
 
-  let _data: GetProxyResponse = data;
+  let _data = data as GetProxyResponse;
   _data = { ..._data, proxy_key };
   let isResidential = "bandwidth_available" in _data;
 
@@ -78,6 +70,8 @@ function ClientPage({ proxy_key }: { proxy_key: string }) {
   ) : (
     <MobileLTE {...(_data as MobileLTEGetProxyResponse)} />
   );
+
+  return;
 }
 
 function ResidentialProxy(data: ResidentialGetProxyResponse) {
