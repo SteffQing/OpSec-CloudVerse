@@ -8,16 +8,15 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { API_URL } from "@/lib/const";
 import { useToast } from "@/components/ui/use-toast";
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
 import Loader from "@/assets/loader";
 
 export default function Page() {
   const [key, setKey] = useSessionStorage("proxy_key", "");
   const [loading, setLoading] = useState(false);
+  const [valid, setValid] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
-
-  let design = "DEX";
 
   async function handleLogin() {
     setLoading(true);
@@ -41,8 +40,15 @@ export default function Page() {
       });
       return;
     }
-    router.push("/client");
+    setValid(true);
   }
+
+  useEffect(() => {
+    if (valid) {
+      router.push("/client");
+    }
+  }, [valid]);
+
   return (
     <main className="px-4 md:px-6 pt-44 md:pt-24 bg-[#0A0B14] h-screen">
       <BoxWrapper title="Login">

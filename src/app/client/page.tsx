@@ -53,10 +53,12 @@ export default function Page() {
   }, []);
 
   const router = useRouter();
-  if (!proxy_key) {
-    router.push("/client/login");
-    return;
-  }
+  useEffect(() => {
+    if (!proxy_key) {
+      router.push("/client/login");
+      // return;
+    }
+  }, [proxy_key]);
 
   if (isLoading) return <Placeholder text="Loading..." className="h-screen" />;
   if (isError) return <Placeholder text="Error" className="h-screen" />;
