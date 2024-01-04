@@ -5,7 +5,7 @@ import { useRef, useState } from "react";
 import { fetchInvoice, fetchReceiptStatus } from "@/lib/now_payments";
 import Loader from "@/assets/loader";
 import { dispatchProxy } from "@/lib/proxies";
-import { redisClient, validateEmail } from "@/lib/utils";
+import { validateEmail } from "@/lib/utils";
 import { PlanType } from "./Plan";
 import { useToast } from "./ui/use-toast";
 
@@ -66,13 +66,7 @@ export default function Modal(props: ModalProps) {
       });
       return;
     }
-    let _receipt = await redisClient("get", recipient, "");
-    if (_receipt.data) {
-      let payment_status = await fetchReceiptStatus(_receipt.data);
-      console.log(payment_status);
 
-      // await redisClient("rem", recipient, _receipt.data);
-    }
     setLoading(false);
 
     let modal = {
@@ -94,7 +88,6 @@ export default function Modal(props: ModalProps) {
       window.open(_data.invoice_url, "_blank");
 
       setModal(process_pay_modal);
-      await redisClient("set", recipient, _data.id);
     } catch (error) {
       let modal = {
         ...props,
@@ -119,7 +112,6 @@ export default function Modal(props: ModalProps) {
         setLoading(false);
         return;
       }
-      await redisClient("rem", recipient, _receipt.toString());
       setLoading(false);
       toast({
         title: "Success",
