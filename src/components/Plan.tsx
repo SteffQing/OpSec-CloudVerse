@@ -8,6 +8,7 @@ import { useState } from "react";
 import { ModalProps } from "./Modal";
 import { Line_Mobile, Line_Tablet } from "@/assets/line";
 import { cn } from "@/lib/utils";
+import Tick from "@/assets/tick";
 
 export type PlanType = "residential" | "lte";
 interface Props {
@@ -51,10 +52,10 @@ function Desktop_Plan(props: Props) {
         </div>
         <Line_Tablet className="h-auto" />
         <div className="bg-gradient-to-r from-color1 to-color2 pt-4 overflow-hidden border border-[#1D202D] w-[60%]">
-          <aside className="p-4 flex flex-col gap-2 items-center">
+          <aside className="p-4 flex flex-col gap-2 items-start">
             {features.map((feature, i) => (
-              <span key={i} className="text-center">
-                {feature}
+              <span key={i} className="flex gap-2 items-center">
+                <Tick className="min-w-[18px]" /> {feature}
               </span>
             ))}
           </aside>
@@ -119,10 +120,10 @@ function Mobile_Plan(props: Props) {
             dropdown && "rounded-tl-none rounded-tr-none"
           )}
         >
-          <aside className="p-4 flex flex-col gap-2 items-center">
+          <aside className="p-4 flex flex-col gap-2 items-start">
             {features.map((feature, i) => (
-              <span key={i} className="text-center">
-                {feature}
+              <span key={i} className="flex gap-2 items-center">
+                <Tick className="min-w-[18px]" /> {feature}
               </span>
             ))}
           </aside>

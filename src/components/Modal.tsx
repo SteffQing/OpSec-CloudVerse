@@ -2,7 +2,7 @@ import Pay_Now from "@/assets/Pay_Now";
 import BoxWrapper from "@/components/Box";
 import useClickOutside from "@/hooks/useClickOutside";
 import { useRef, useState } from "react";
-import { fetchInvoice } from "@/lib/now_payments";
+import { fetchInvoice, fetchReceiptStatus } from "@/lib/now_payments";
 import Loader from "@/assets/loader";
 import { dispatchProxy } from "@/lib/proxies";
 import { redisClient, validateEmail } from "@/lib/utils";
@@ -68,7 +68,10 @@ export default function Modal(props: ModalProps) {
     }
     let _receipt = await redisClient("get", recipient, "");
     if (_receipt.data) {
-      await redisClient("rem", recipient, _receipt.data);
+      let payment_status = await fetchReceiptStatus(_receipt.data);
+      console.log(payment_status);
+
+      // await redisClient("rem", recipient, _receipt.data);
     }
     setLoading(false);
 

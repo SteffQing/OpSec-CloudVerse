@@ -56,7 +56,6 @@ export default function Page() {
   useEffect(() => {
     if (!proxy_key) {
       router.push("/client/login");
-      // return;
     }
   }, [proxy_key]);
 
@@ -72,8 +71,6 @@ export default function Page() {
   ) : (
     <MobileLTE {...(_data as MobileLTEGetProxyResponse)} />
   );
-
-  return;
 }
 
 function ResidentialProxy(data: ResidentialGetProxyResponse) {
