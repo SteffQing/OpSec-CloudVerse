@@ -6,6 +6,7 @@ let EmailJS_Residential_Template = "template_88phu08";
 let EmailJS_Mobile_Template = "template_44v88ps";
 let EmailJS_ServiceID = "service_iiplwio";
 let EmailJS_PublicKey = "lX1bGpk8OWh32ZCQq";
+let EmailJS_ENDPOINT = "https://api.emailjs.com/api/v1.0/email/send";
 let AbstractAPI_KEY = "3385af73f07f4f758a38a373f3e3aa22";
 let API_URL = "https://op-sec-cloud-verse.vercel.app/";
 // let API_URL = "http://localhost:3000/";
@@ -28,4 +29,5 @@ export {
   BUY_PROXY_ENDPOINT,
   GET_PROXY_ENDPOINT,
   EmailJS_PublicKey,
+  EmailJS_ENDPOINT,
 };

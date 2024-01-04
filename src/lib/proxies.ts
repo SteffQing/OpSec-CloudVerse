@@ -1,30 +1,26 @@
 import { ParamsProps } from "@/components/Modal";
 import {
   API_URL,
+  EmailJS_ENDPOINT,
   EmailJS_Mobile_Template,
   EmailJS_PublicKey,
   EmailJS_Residential_Template,
   EmailJS_ServiceID,
 } from "./const";
-import { fetchReceiptStatus } from "./now_payments";
-import emailjs from "@emailjs/browser";
+// import { fetchReceiptStatus } from "./now_payments";
+// import emailjs from "@emailjs/browser";
 import axios from "axios";
 
-export async function dispatchProxy(
-  paymentID: number,
-  recipient: string,
-  data: ParamsProps
-) {
+export async function dispatchProxy(recipient: string, data: ParamsProps) {
   const { size, type } = data;
   /* Fetch the receipt status */
-  let receipt = await fetchReceiptStatus(paymentID);
-  if (receipt.status === false) {
-    return receipt;
-  }
+  // let receipt = await fetchReceiptStatus(paymentID);
+  // if (receipt.status === false) {
+  //   return receipt;
+  // }
 
   /* Purchase the Proxy */
   let response = await axios.post(API_URL + "buy-proxy", { size, type });
-  console.log(response.data, "RESPONSE");
 
   if (response.data.status !== "success") {
     return { code: "FAILED", ...response.data };
@@ -51,10 +47,18 @@ export async function dispatchProxy(
         });
   const order_date = new Date().toLocaleDateString();
   email_response = { ...email_response, recipient, order_date, proxy_key };
-  emailjs
-    .send(EmailJS_ServiceID, template, email_response, EmailJS_PublicKey)
-    .then((res) => console.log(res.text))
+  let email_data = {
+    service_id: EmailJS_ServiceID,
+    template_id: template,
+    user_id: EmailJS_PublicKey,
+    template_params: email_response,
+  };
+  await axios
+    .post(EmailJS_ENDPOINT, email_data)
+    .then((res) => console.log(res.data))
     .catch((err) => console.error(err));
+  // emailjs
+  // .send(EmailJS_ServiceID, template, email_response, EmailJS_PublicKey)
 
   return { status: true };
 }

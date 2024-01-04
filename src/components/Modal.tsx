@@ -8,6 +8,8 @@ import { dispatchProxy } from "@/lib/proxies";
 import { validateEmail } from "@/lib/utils";
 import { PlanType } from "./Plan";
 import { useToast } from "./ui/use-toast";
+import { API_URL } from "@/lib/const";
+import axios from "axios";
 
 export interface ParamsProps {
   size: number;
@@ -81,10 +83,9 @@ export default function Modal(props: ModalProps) {
   async function process_pay() {
     try {
       setLoading(true);
-      let _data = await fetchInvoice(data);
-
-      setReceipt(_data.id);
+      let _data = await fetchInvoice(data, recipient);
       setLoading(false);
+
       window.open(_data.invoice_url, "_blank");
 
       setModal(process_pay_modal);
@@ -99,29 +100,7 @@ export default function Modal(props: ModalProps) {
       console.log(error);
     }
   }
-  async function process_proxy() {
-    try {
-      setLoading(true);
-      let _receipt = receipt as number;
-      let response = await dispatchProxy(_receipt, recipient, data);
-      if (response.status === false) {
-        toast({
-          title: "Error: " + response.code,
-          description: response.message,
-        });
-        setLoading(false);
-        return;
-      }
-      setLoading(false);
-      toast({
-        title: "Success",
-        description: "Proxy dispatched successfully, please check your email",
-      });
-      setModal(null);
-    } catch (error) {
-      console.log(error);
-    }
-  }
+
   return (
     <main className="bg-transparent z-50 fixed w-full h-full">
       <div ref={ref}>
@@ -149,9 +128,7 @@ export default function Modal(props: ModalProps) {
             )}
             <button
               className="bg-[#F44336] w-full rounded-md my-6 p-2 text-center"
-              onClick={
-                receipt ? process_proxy : pay_now ? process_pay : refer_to_pay
-              }
+              onClick={pay_now ? process_pay : refer_to_pay}
             >
               {loading ? <Loader /> : buttonText}
             </button>
