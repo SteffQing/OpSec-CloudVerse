@@ -1,22 +1,46 @@
-import { amount, min } from "@/lib/now_payments";
+import { Resend } from "resend";
+import EmailTemplate from "@/components/EmailTemplate";
+import { redisClient } from "@/lib/utils";
+import { dispatchProxy } from "@/lib/proxies";
+import { PlanType } from "@/components/Plan";
 
-export async function GET() {
-  let { selectedCurrencies }: { selectedCurrencies: string[] } = await min();
+export async function POST(request: Request) {
+  const resend = new Resend("re_PvTffwEF_7z18MipGSFfKPPpJv41vTqmp");
 
-  let queryUrls = selectedCurrencies.map((currency) =>
-    amount(currency.toLowerCase())
-  );
-  console.time("query");
-  let queries = await Promise.all(queryUrls);
-  console.timeEnd("query");
-  let data = queries.filter(({ fiat_equivalent, currency_from }) => {
-    if (fiat_equivalent < 6) {
-      return {
-        fiat_equivalent,
-        currency_from,
-      };
+  const url = new URL(request.url);
+
+  const body = url.searchParams.get("body") as string;
+  let { recipient, data, order_id } = JSON.parse(body);
+
+  let paymentID = await redisClient("get", order_id);
+
+  if (paymentID === null) {
+    return Response.json({ status: false, message: "Payment not found" });
+  }
+
+  let response = await dispatchProxy(data);
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: "OpSec <onboarding@resend.dev>",
+      to: [recipient],
+      subject: getTopic(response.type, response.data.order_id),
+      react: EmailTemplate(response) as React.ReactElement,
+    });
+
+    if (error) {
+      return Response.json({ error });
     }
-  });
 
-  return Response.json(data);
+    await redisClient("rem", order_id);
+    return Response.json({ data });
+  } catch (error) {
+    return Response.json({ error });
+  }
+}
+
+function getTopic(type: PlanType, order_id: string) {
+  return type === "residential"
+    ? `Your Residential Proxy OpSec Order: ${order_id} Has Been Delivered! `
+    : `Your Mobile LTE OpSec Order with ID: ${order_id} Has Been Delivered! `;
 }

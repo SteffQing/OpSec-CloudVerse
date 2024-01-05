@@ -13,6 +13,7 @@ let API_URL = "https://op-sec-cloud-verse.vercel.app/";
 let PROXY_KEY = "9ba0d360a0ba11c240d8f9f838e82f2e68ad888c";
 let BUY_PROXY_ENDPOINT = "https://reseller-api.proxies.rip/api/buy_proxy";
 let GET_PROXY_ENDPOINT = "https://reseller-api.proxies.rip/api/get_order_info";
+let RESEND_KEY = "re_PvTffwEF_7z18MipGSFfKPPpJv41vTqmp";
 
 export {
   REDIS_KEY,
@@ -28,4 +29,5 @@ export {
   GET_PROXY_ENDPOINT,
   EmailJS_PublicKey,
   EmailJS_ENDPOINT,
+  RESEND_KEY,
 };
