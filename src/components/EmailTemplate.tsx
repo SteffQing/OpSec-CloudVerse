@@ -23,7 +23,7 @@ function Mobile_Template({ data, proxy_key }: EmailTemplateProps) {
     <div>
       <p>Dear User,</p>
       <p>
-        We're thrilled to inform you that your recent Mobile LTE order with
+        We&apos;re thrilled to inform you that your recent Mobile LTE order with
         OpSec has been successfully delivered! Here are the details:
       </p>
       <p>Proxy Key to access your OpSec Client Area: {proxy_key}&nbsp;</p>
@@ -66,8 +66,8 @@ function Residential_Template({ data, proxy_key }: EmailTemplateProps) {
     <>
       <p>Dear User,</p>
       <p>
-        We're thrilled to inform you that your recent Residential Proxy order
-        with OpSec has been successfully delivered! Here are the details:
+        We&apos;re thrilled to inform you that your recent Residential Proxy
+        order with OpSec has been successfully delivered! Here are the details:
       </p>
       <p>Proxy Key to access your OpSec Client Area: {proxy_key}&nbsp;</p>
       <p>
