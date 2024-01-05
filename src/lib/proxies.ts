@@ -7,23 +7,27 @@ import {
   EmailJS_Residential_Template,
   EmailJS_ServiceID,
 } from "./const";
-// import { fetchReceiptStatus } from "./now_payments";
+import { fetchReceiptStatus } from "./now_payments";
 // import emailjs from "@emailjs/browser";
 import axios from "axios";
 
-export async function dispatchProxy(recipient: string, data: ParamsProps) {
+export async function dispatchProxy(
+  recipient: string,
+  data: ParamsProps,
+  paymentID: number
+) {
   const { size, type } = data;
   /* Fetch the receipt status */
-  // let receipt = await fetchReceiptStatus(paymentID);
-  // if (receipt.status === false) {
-  //   return receipt;
-  // }
+  let receipt = await fetchReceiptStatus(paymentID);
+  if (receipt.status === false) {
+    return { ...receipt, res: false };
+  }
 
   /* Purchase the Proxy */
   let response = await axios.post(API_URL + "buy-proxy", { size, type });
 
   if (response.data.status !== "success") {
-    return { code: "FAILED", ...response.data };
+    return { code: "FAILED", ...response.data, res: false };
   }
 
   const order_details: ProxyResponse = response.data;
@@ -60,7 +64,7 @@ export async function dispatchProxy(recipient: string, data: ParamsProps) {
   // emailjs
   // .send(EmailJS_ServiceID, template, email_response, EmailJS_PublicKey)
 
-  return { status: true };
+  return { res: true };
 }
 function mobile_template(template: LTE_Template) {
   const { order_id, expire_at, proxy, days, ip } = template;

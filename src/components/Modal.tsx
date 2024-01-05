@@ -5,11 +5,12 @@ import { useRef, useState } from "react";
 import { fetchInvoice, fetchReceiptStatus } from "@/lib/now_payments";
 import Loader from "@/assets/loader";
 import { dispatchProxy } from "@/lib/proxies";
-import { validateEmail } from "@/lib/utils";
+import { redisClient, validateEmail } from "@/lib/utils";
 import { PlanType } from "./Plan";
 import { useToast } from "./ui/use-toast";
 import { API_URL } from "@/lib/const";
 import axios from "axios";
+import { generateRandomString } from "@/lib/generateProxies";
 
 export interface ParamsProps {
   size: number;
@@ -83,11 +84,13 @@ export default function Modal(props: ModalProps) {
   async function process_pay() {
     try {
       setLoading(true);
-      let _data = await fetchInvoice(data, recipient);
+      let order_id = generateRandomString();
+      let { invoice_url, id } = await fetchInvoice(data, recipient, order_id);
       setLoading(false);
 
-      window.open(_data.invoice_url, "_blank");
-
+      window.open(invoice_url, "_blank");
+      let _order_id = order_id + ":" + id;
+      await redisClient("set", _order_id);
       setModal(process_pay_modal);
     } catch (error) {
       let modal = {

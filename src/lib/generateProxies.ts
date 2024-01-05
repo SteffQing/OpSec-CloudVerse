@@ -94,7 +94,7 @@ function formatProxy(
     return `${username}:${password}${remainingProxy}:${host}:${port}`;
   }
 }
-function generateRandomString() {
+export function generateRandomString() {
   let result = "";
   const characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
