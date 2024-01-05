@@ -16,6 +16,12 @@ export async function POST(request: Request) {
   let paymentID = await redisClient("get", order_id);
 
   if (paymentID === null) {
+    await resend.emails.send({
+      from: "OpSec <onboarding@resend.dev>",
+      to: [recipient],
+      subject: "Payment not found",
+      text: `Payment with ID: ${order_id} not found`,
+    });
     return Response.json({ status: false, message: "Payment not found" });
   }
 
@@ -30,12 +36,24 @@ export async function POST(request: Request) {
     });
 
     if (error) {
+      await resend.emails.send({
+        from: "OpSec <onboarding@resend.dev>",
+        to: [recipient],
+        subject: "Error sending email",
+        text: JSON.stringify(error),
+      });
       return Response.json({ error });
     }
 
     await redisClient("rem", order_id);
     return Response.json({ data });
   } catch (error) {
+    await resend.emails.send({
+      from: "OpSec <onboarding@resend.dev>",
+      to: [recipient],
+      subject: "Catch all Error",
+      text: JSON.stringify(error),
+    });
     return Response.json({ error });
   }
 }
