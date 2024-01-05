@@ -2,14 +2,11 @@ import Pay_Now from "@/assets/Pay_Now";
 import BoxWrapper from "@/components/Box";
 import useClickOutside from "@/hooks/useClickOutside";
 import { useRef, useState } from "react";
-import { fetchInvoice, fetchReceiptStatus } from "@/lib/now_payments";
+import { fetchInvoice } from "@/lib/now_payments";
 import Loader from "@/assets/loader";
-import { dispatchProxy } from "@/lib/proxies";
 import { redisClient, validateEmail } from "@/lib/utils";
 import { PlanType } from "./Plan";
 import { useToast } from "./ui/use-toast";
-import { API_URL } from "@/lib/const";
-import axios from "axios";
 import { generateRandomString } from "@/lib/generateProxies";
 
 export interface ParamsProps {
@@ -30,20 +27,10 @@ export default function Modal(props: ModalProps) {
   const ref = useRef(null);
   const [recipient, setRecipient] = useState("");
   const [loading, setLoading] = useState<boolean>(false);
-  const [receipt, setReceipt] = useState<number | null>(null);
   const { title, subtitle, data, buttonText, setModal, pay_now, placeholder } =
     props;
   useClickOutside(ref, () => setModal(null));
   const { toast } = useToast();
-
-  /* Modal data */
-  let process_pay_modal = {
-    ...props,
-    pay_now: true,
-    title: "Processing Payment",
-    buttonText: "Confirm Payment",
-    subtitle: "Click button below after payment to continue",
-  };
 
   async function refer_to_pay() {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -59,6 +46,8 @@ export default function Modal(props: ModalProps) {
     setLoading(true);
     let validateMailAddress = await validateEmail(recipient);
     const { autocorrect, deliverability } = validateMailAddress;
+    console.log(validateMailAddress);
+
     if (autocorrect) {
       setRecipient(autocorrect);
     }
@@ -91,7 +80,7 @@ export default function Modal(props: ModalProps) {
       window.open(invoice_url, "_blank");
       let _order_id = order_id + ":" + id;
       await redisClient("set", _order_id);
-      setModal(process_pay_modal);
+      setModal(null);
     } catch (error) {
       let modal = {
         ...props,
