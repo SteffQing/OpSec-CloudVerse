@@ -13,6 +13,7 @@ export async function fetchInvoice(
 
   let body = JSON.stringify({ recipient, data, order_id });
   let url = API_URL + "process-proxy?body=" + encodeURIComponent(body);
+  console.log(url);
 
   var raw = JSON.stringify({
     price_amount: price,
