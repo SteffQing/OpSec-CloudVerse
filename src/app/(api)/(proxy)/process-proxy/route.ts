@@ -8,13 +8,10 @@ import { RESEND_KEY } from "@/lib/const";
 const resend = new Resend(RESEND_KEY);
 
 export async function POST(request: Request) {
-  const url = new URL(request.url);
-
-  const body = url.searchParams.get("body") as string;
-  let { recipient, data, order_id } = JSON.parse(body);
+  let { recipient, data, order_id } = await request.json();
+  console.log(await request.json());
 
   let paymentID = await redisClient("get", order_id);
-
   if (paymentID === null) {
     await resend.emails.send({
       from: "OpSec <onboarding@resend.dev>",
@@ -36,24 +33,12 @@ export async function POST(request: Request) {
     });
 
     if (error) {
-      await resend.emails.send({
-        from: "OpSec <onboarding@resend.dev>",
-        to: [recipient],
-        subject: "Error sending email",
-        text: JSON.stringify(error),
-      });
       return Response.json({ error });
     }
 
     await redisClient("rem", order_id);
     return Response.json({ data });
   } catch (error) {
-    await resend.emails.send({
-      from: "OpSec <onboarding@resend.dev>",
-      to: [recipient],
-      subject: "Catch all Error",
-      text: JSON.stringify(error),
-    });
     return Response.json({ error });
   }
 }

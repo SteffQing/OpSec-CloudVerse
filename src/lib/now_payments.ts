@@ -6,21 +6,21 @@ export async function fetchInvoice(
   recipient: string,
   order_id: string
 ) {
-  let { size, price, type } = data;
   var myHeaders = new Headers();
   myHeaders.append("x-api-key", NOW_PAYMENTS_API_KEY);
   myHeaders.append("Content-Type", "application/json");
 
   let body = JSON.stringify({ recipient, data, order_id });
-  let url = API_URL + "process-proxy?body=" + encodeURIComponent(body);
+  let url = API_URL + "process-proxy";
   console.log(url);
 
   var raw = JSON.stringify({
-    price_amount: price,
+    price_amount: data.price,
     price_currency: "usd",
     order_id,
-    order_description: JSON.stringify({ size, type }),
+    order_description: body,
     ipn_callback_url: url,
+    success_url: url,
   });
 
   var requestOptions = {

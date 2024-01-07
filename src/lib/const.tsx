@@ -2,7 +2,8 @@ let REDIS_KEY =
   "redis://default:90WakfmRS5FHMqZKLt42Tewjb06KvZem@redis-19770.c267.us-east-1-4.ec2.cloud.redislabs.com:19770";
 // let NOW_PAYMENTS_ENDPOINT = "https://api.nowpayments.io/v1/";
 let NOW_PAYMENTS_ENDPOINT = "https://api-sandbox.nowpayments.io/v1/";
-let NOW_PAYMENTS_API_KEY = "BY77TMJ-5T0MQBR-GCCJT4W-H7CV296";
+// let NOW_PAYMENTS_API_KEY = "BY77TMJ-5T0MQBR-GCCJT4W-H7CV296";
+let NOW_PAYMENTS_API_KEY = "HMDDVV0-TD0478N-PJ7Z9GM-QR5GCK0";
 let EmailJS_Residential_Template = "template_88phu08";
 let EmailJS_Mobile_Template = "template_44v88ps";
 let EmailJS_ServiceID = "service_iiplwio";
