@@ -20,11 +20,24 @@ export async function validateEmail(email: string) {
 
 type Action = "set" | "get" | "rem" | "key";
 
-export async function redisClient(action: Action, order_id: string) {
-  return axios
-    .get(`${API_URL}redis?action=${action}&order_id=${order_id}`)
-    .then((response) => response.data)
-    .catch((error) => {
-      console.log(error);
-    });
+export async function redisClient(
+  action: Action,
+  order_id: string,
+  order?: object
+) {
+  if (!order) {
+    return axios
+      .get(`${API_URL}redis?action=${action}&order_id=${order_id}`)
+      .then((response) => response.data)
+      .catch((error) => {
+        console.log(error);
+      });
+  } else {
+    return axios
+      .post(`${API_URL}redis`, { action, key: order_id, data: order })
+      .then((response) => response.data)
+      .catch((error) => {
+        console.log(error);
+      });
+  }
 }

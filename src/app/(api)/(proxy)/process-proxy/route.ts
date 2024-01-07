@@ -9,14 +9,14 @@ const resend = new Resend(RESEND_KEY);
 
 export async function POST(request: Request) {
   try {
-    let { order_description } = await request.json();
-    let { recipient, data, order_id } = JSON.parse(order_description);
+    let { order_id } = await request.json();
 
-    let paymentID = await redisClient("get", order_id);
+    let paymentID = await redisClient("get", order_id, { json: true });
     if (paymentID === null) {
       return Response.json({ status: false, message: "Payment not found" });
     }
 
+    let { recipient, data } = JSON.parse(paymentID);
     let response = await dispatchProxy(data);
 
     try {
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
         return Response.json({ error });
       }
 
-      await redisClient("rem", order_id);
+      await redisClient("rem", order_id, { json: true });
       return Response.json({ data });
     } catch (error) {
       return Response.json({ error });

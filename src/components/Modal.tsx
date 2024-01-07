@@ -74,12 +74,11 @@ export default function Modal(props: ModalProps) {
     try {
       setLoading(true);
       let order_id = generateRandomString();
-      let { invoice_url, id } = await fetchInvoice(data, recipient, order_id);
+      let { invoice_url } = await fetchInvoice(data, order_id);
       setLoading(false);
 
+      await redisClient("set", order_id, { recipient, data });
       window.open(invoice_url, "_blank");
-      let _order_id = order_id + ":" + id;
-      await redisClient("set", _order_id);
       setModal(null);
     } catch (error) {
       let modal = {

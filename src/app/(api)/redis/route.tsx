@@ -36,3 +36,31 @@ export async function GET(request: Request) {
 
   return Response.json(result);
 }
+
+export async function POST(request: Request) {
+  const { key, data, action } = await request.json();
+
+  const client = createClient({
+    url: REDIS_KEY,
+  });
+
+  await client.connect();
+
+  let result = "";
+
+  if (action === "set") {
+    await client.json.set(key, "$", data);
+  }
+
+  if (action === "get") {
+    result = (await client.json.get(key)) as string;
+  }
+
+  if (action === "rem") {
+    await client.json.del(key, "$");
+  }
+
+  await client.quit();
+
+  return Response.json(result);
+}

@@ -1,25 +1,17 @@
 import { ParamsProps } from "@/components/Modal";
 import { API_URL, NOW_PAYMENTS_API_KEY, NOW_PAYMENTS_ENDPOINT } from "./const";
 
-export async function fetchInvoice(
-  data: ParamsProps,
-  recipient: string,
-  order_id: string
-) {
+export async function fetchInvoice(data: ParamsProps, order_id: string) {
   var myHeaders = new Headers();
   myHeaders.append("x-api-key", NOW_PAYMENTS_API_KEY);
   myHeaders.append("Content-Type", "application/json");
-
-  let body = JSON.stringify({ recipient, data, order_id });
-  let url = API_URL + "process-proxy";
 
   var raw = JSON.stringify({
     price_amount: data.price,
     price_currency: "usd",
     order_id,
-    order_description: body,
-    ipn_callback_url: url,
-    success_url: url,
+    order_description: "OpSec Proxy Purchase",
+    ipn_callback_url: API_URL + "process-proxy",
   });
 
   var requestOptions = {
