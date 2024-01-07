@@ -9,8 +9,8 @@ const resend = new Resend(RESEND_KEY);
 
 export async function POST(request: Request) {
   try {
-    let body = await request.json();
-    let { recipient, data, order_id } = body;
+    let { order_description } = await request.json();
+    let { recipient, data, order_id } = JSON.parse(order_description);
 
     let paymentID = await redisClient("get", order_id);
     if (paymentID === null) {
