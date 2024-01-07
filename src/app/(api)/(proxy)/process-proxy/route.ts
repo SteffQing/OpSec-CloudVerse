@@ -8,6 +8,8 @@ import { RESEND_KEY } from "@/lib/const";
 const resend = new Resend(RESEND_KEY);
 
 export async function POST(request: Request) {
+  console.log("Headers \n", request.headers);
+
   try {
     let { order_id } = await request.json();
 
