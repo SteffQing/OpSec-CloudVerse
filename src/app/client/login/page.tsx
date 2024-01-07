@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { API_URL } from "@/lib/const";
 import { useToast } from "@/components/ui/use-toast";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Loader from "@/assets/loader";
 
 export default function Page() {

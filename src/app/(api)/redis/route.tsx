@@ -28,6 +28,10 @@ export async function GET(request: Request) {
     await client.hDel("Orders", order_id);
   }
 
+  if (action === "key") {
+    await client.sAdd("Proxies", order_id);
+  }
+
   await client.quit();
 
   return Response.json(result);

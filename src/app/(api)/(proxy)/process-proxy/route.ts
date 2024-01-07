@@ -8,38 +8,37 @@ import { RESEND_KEY } from "@/lib/const";
 const resend = new Resend(RESEND_KEY);
 
 export async function POST(request: Request) {
-  let { recipient, data, order_id } = await request.json();
-  console.log(await request.json());
-
-  let paymentID = await redisClient("get", order_id);
-  if (paymentID === null) {
-    await resend.emails.send({
-      from: "OpSec <onboarding@resend.dev>",
-      to: [recipient],
-      subject: "Payment not found",
-      text: `Payment with ID: ${order_id} not found`,
-    });
-    return Response.json({ status: false, message: "Payment not found" });
-  }
-
-  let response = await dispatchProxy(data);
-
   try {
-    const { data, error } = await resend.emails.send({
-      from: "OpSec <onboarding@resend.dev>",
-      to: [recipient],
-      subject: getTopic(response.type, response.data.order_id),
-      react: EmailTemplate(response) as React.ReactElement,
-    });
+    let body = await request.json();
+    let { recipient, data, order_id } = body;
 
-    if (error) {
-      return Response.json({ error });
+    let paymentID = await redisClient("get", order_id);
+    if (paymentID === null) {
+      return Response.json({ status: false, message: "Payment not found" });
     }
 
-    await redisClient("rem", order_id);
-    return Response.json({ data });
+    let response = await dispatchProxy(data);
+
+    try {
+      const { data, error } = await resend.emails.send({
+        from: "OpSec <info@opsec.software>",
+        to: [recipient],
+        subject: getTopic(response.type, response.data.order_id),
+        react: EmailTemplate(response) as React.ReactElement,
+      });
+
+      if (error) {
+        return Response.json({ error });
+      }
+
+      await redisClient("rem", order_id);
+      return Response.json({ data });
+    } catch (error) {
+      return Response.json({ error });
+    }
   } catch (error) {
-    return Response.json({ error });
+    console.log(error);
+    return Response.json(error);
   }
 }
 

@@ -18,7 +18,7 @@ export async function validateEmail(email: string) {
     });
 }
 
-type Action = "set" | "get" | "rem";
+type Action = "set" | "get" | "rem" | "key";
 
 export async function redisClient(action: Action, order_id: string) {
   return axios

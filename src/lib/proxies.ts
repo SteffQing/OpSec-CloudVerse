@@ -1,6 +1,7 @@
 import { ParamsProps } from "@/components/Modal";
 import { API_URL } from "./const";
 import axios from "axios";
+import { redisClient } from "./utils";
 
 export async function dispatchProxy(data: ParamsProps) {
   const { size, type } = data;
@@ -14,6 +15,7 @@ export async function dispatchProxy(data: ParamsProps) {
 
   const order_details: ProxyResponse = response.data;
   const proxy_key = `OPSEC-${order_details.order_id}-SW`;
+  await redisClient("key", proxy_key);
 
   let _response =
     type === "residential"
