@@ -16,7 +16,7 @@ export async function POST(request: Request) {
       return Response.json({ status: false, message: "Payment not found" });
     }
 
-    let { recipient, data } = JSON.parse(paymentID);
+    let { recipient, data } = paymentID;
     let response = await dispatchProxy(data);
 
     try {
