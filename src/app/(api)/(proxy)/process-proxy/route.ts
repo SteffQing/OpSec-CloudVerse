@@ -8,7 +8,12 @@ import { RESEND_KEY } from "@/lib/const";
 const resend = new Resend(RESEND_KEY);
 
 export async function POST(request: Request) {
-  console.log("Headers \n", request.headers);
+  let notificationsKey = request.headers.get("x-nowpayments-sig");
+  console.log(notificationsKey);
+
+  // const hmac = crypto.createHmac("sha512", notificationsKey);
+  // hmac.update(JSON.stringify(sortObject(params)));
+  // const signature = hmac.digest("hex");
 
   try {
     let { order_id } = await request.json();
@@ -48,4 +53,15 @@ function getTopic(type: PlanType, order_id: string) {
   return type === "residential"
     ? `Your Residential Proxy OpSec Order: ${order_id} Has Been Delivered! `
     : `Your Mobile LTE OpSec Order with ID: ${order_id} Has Been Delivered! `;
+}
+function sortObject(obj: any) {
+  return Object.keys(obj)
+    .sort()
+    .reduce((result: any, key) => {
+      result[key] =
+        obj[key] && typeof obj[key] === "object"
+          ? sortObject(obj[key])
+          : obj[key];
+      return result;
+    }, {});
 }
