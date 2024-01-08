@@ -1,14 +1,11 @@
 let REDIS_KEY =
   "redis://default:90WakfmRS5FHMqZKLt42Tewjb06KvZem@redis-19770.c267.us-east-1-4.ec2.cloud.redislabs.com:19770";
-// let NOW_PAYMENTS_ENDPOINT = "https://api.nowpayments.io/v1/";
-let NOW_PAYMENTS_ENDPOINT = "https://api-sandbox.nowpayments.io/v1/";
-// let NOW_PAYMENTS_API_KEY = "BY77TMJ-5T0MQBR-GCCJT4W-H7CV296";
-let NOW_PAYMENTS_API_KEY = "HMDDVV0-TD0478N-PJ7Z9GM-QR5GCK0";
-let EmailJS_Residential_Template = "template_88phu08";
-let EmailJS_Mobile_Template = "template_44v88ps";
-let EmailJS_ServiceID = "service_iiplwio";
-let EmailJS_PublicKey = "lX1bGpk8OWh32ZCQq";
-let EmailJS_ENDPOINT = "https://api.emailjs.com/api/v1.0/email/send";
+let NOW_PAYMENTS_ENDPOINT = "https://api.nowpayments.io/v1/";
+let NOW_PAYMENTS_API_KEY = "BY77TMJ-5T0MQBR-GCCJT4W-H7CV296";
+let NOW_PAYMENTS_IPN_KEY = "soon";
+/ Now Payments Sandbox environment keys /;
+// let NOW_PAYMENTS_ENDPOINT = "https://api-sandbox.nowpayments.io/v1/";
+// let NOW_PAYMENTS_API_KEY = "HMDDVV0-TD0478N-PJ7Z9GM-QR5GCK0";
 let AbstractAPI_KEY = "3385af73f07f4f758a38a373f3e3aa22";
 let API_URL = "https://op-sec-cloud-verse.vercel.app/";
 // let API_URL = "http://localhost:3000/";
@@ -21,15 +18,11 @@ export {
   REDIS_KEY,
   NOW_PAYMENTS_ENDPOINT,
   NOW_PAYMENTS_API_KEY,
-  EmailJS_Residential_Template,
-  EmailJS_Mobile_Template,
-  EmailJS_ServiceID,
+  NOW_PAYMENTS_IPN_KEY,
   AbstractAPI_KEY,
   API_URL,
   PROXY_KEY,
   BUY_PROXY_ENDPOINT,
   GET_PROXY_ENDPOINT,
-  EmailJS_PublicKey,
-  EmailJS_ENDPOINT,
   RESEND_KEY,
 };

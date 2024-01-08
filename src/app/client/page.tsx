@@ -246,6 +246,20 @@ function ProxyGenerator(data: ResidentialGetProxyResponse) {
 function MobileLTE(data: MobileLTEGetProxyResponse) {
   const [newIP, setNewIP] = useState("");
   const { proxy_key, current_whitelisted_ip, expire_at } = data;
+  const [, copy] = useCopyToClipboard();
+  const { toast } = useToast();
+
+  const copyKey = async () => {
+    let copied = await copy(proxy_key);
+    if (copied) {
+      toast({
+        title: "Proxy Key copied",
+        description: "Your proxy key has been copied successfully",
+        duration: 4000,
+      });
+    }
+  };
+
   return (
     <main className="px-4 md:px-6 pt-44 md:pt-24 bg-[#0A0B14]">
       <div className="mt-6">
@@ -258,7 +272,10 @@ function MobileLTE(data: MobileLTEGetProxyResponse) {
                 className="border border-[#1D202D] rounded-md py-2 px-5 my-4 login-input"
                 readOnly
               />
-              <button className="bg-[#1D202D] rounded-md py-2 px-5 my-4 login-input">
+              <button
+                className="bg-[#1D202D] rounded-md py-2 px-5 my-4 login-input"
+                onClick={copyKey}
+              >
                 Copy
               </button>
             </div>
@@ -275,7 +292,10 @@ function MobileLTE(data: MobileLTEGetProxyResponse) {
                 className="border border-[#1D202D] rounded-md py-2 px-5 my-4 login-input"
                 onChange={(e) => setNewIP(e.target.value)}
               />
-              <button className="bg-[#1D202D] rounded-md py-2 px-5 my-4 login-input">
+              <button
+                className="bg-[#1D202D] rounded-md py-2 px-5 my-4 login-input"
+                onClick={() => console.log(newIP)}
+              >
                 Edit
               </button>
             </div>
